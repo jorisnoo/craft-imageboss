@@ -10,6 +10,8 @@ class Settings extends Model
 
     public ?string $token = null;
 
+    public ?string $apiKey = null;
+
     public string $baseUrl = 'https://img.imageboss.me';
 
     public bool $includeVolumeFolder = true;

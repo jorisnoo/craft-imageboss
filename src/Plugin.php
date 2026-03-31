@@ -5,7 +5,9 @@ namespace Noo\CraftImageboss;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
+use craft\services\Assets;
 use craft\web\twig\variables\CraftVariable;
+use Noo\CraftImageboss\listeners\PurgeAssetFromImageBoss;
 use Noo\CraftImageboss\models\Settings;
 use Noo\CraftImageboss\twig\ImageBossTwigExtension;
 use Noo\CraftImageboss\twig\ImageBossVariable;
@@ -33,6 +35,15 @@ class Plugin extends BasePlugin
                 $event->sender->set('imageboss', ImageBossVariable::class);
             }
         );
+
+        if ($this->getSettings()->apiKey) {
+            $listener = new PurgeAssetFromImageBoss();
+            Event::on(
+                Assets::class,
+                Assets::EVENT_AFTER_REPLACE_ASSET,
+                [$listener, 'handle']
+            );
+        }
     }
 
     protected function createSettingsModel(): ?Model

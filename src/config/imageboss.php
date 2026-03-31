@@ -27,6 +27,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | ImageBoss API Key
+    |--------------------------------------------------------------------------
+    |
+    | API key for cache purging. When set, the plugin will automatically
+    | purge ImageBoss cache when assets are replaced in Craft.
+    |
+    */
+    'apiKey' => App::env('IMAGEBOSS_API_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Base URL
     |--------------------------------------------------------------------------
     */
