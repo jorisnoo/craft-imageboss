@@ -52,36 +52,10 @@ class ImageBossVariable
             return $builder->preset($options);
         }
 
-        if (isset($options['preset'])) {
-            $builder->preset($options['preset']);
-        }
-
-        if (isset($options['width'])) {
-            $builder->width($options['width']);
-        }
-
-        if (isset($options['height'])) {
-            $builder->height($options['height']);
-        }
-
-        if (isset($options['ratio'])) {
-            $builder->ratio($options['ratio']);
-        }
-
-        if (isset($options['min'])) {
-            $builder->min($options['min']);
-        }
-
-        if (isset($options['max'])) {
-            $builder->max($options['max']);
-        }
-
-        if (isset($options['interval'])) {
-            $builder->interval($options['interval']);
-        }
-
-        if (isset($options['format'])) {
-            $builder->format($options['format']);
+        foreach (['preset', 'width', 'height', 'ratio', 'min', 'max', 'interval', 'format'] as $key) {
+            if (isset($options[$key])) {
+                $builder->$key($options[$key]);
+            }
         }
 
         return $builder;

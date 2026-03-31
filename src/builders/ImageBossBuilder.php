@@ -141,24 +141,10 @@ class ImageBossBuilder
             return $this;
         }
 
-        if (isset($config['min'])) {
-            $this->min = $config['min'];
-        }
-
-        if (isset($config['max'])) {
-            $this->max = $config['max'];
-        }
-
-        if (isset($config['ratio'])) {
-            $this->ratio = $config['ratio'];
-        }
-
-        if (isset($config['interval'])) {
-            $this->interval = $config['interval'];
-        }
-
-        if (isset($config['format'])) {
-            $this->format = $config['format'];
+        foreach (['min', 'max', 'ratio', 'interval', 'format'] as $key) {
+            if (isset($config[$key])) {
+                $this->$key = $config[$key];
+            }
         }
 
         return $this;
@@ -166,17 +152,9 @@ class ImageBossBuilder
 
     public function url(): string
     {
-        $settings = $this->getSettings();
-        $width = $this->width ?? $settings->defaultWidth;
-        $height = $this->calculateHeight($width);
+        $width = $this->width ?? $this->getSettings()->defaultWidth;
 
-        if (! $settings->source) {
-            return $this->generateCraftTransformUrl($width, $height);
-        }
-
-        $path = $this->buildImageBossPath($width, $height);
-
-        return $this->signPath($path);
+        return $this->generateUrlForWidth($width);
     }
 
     /**
@@ -184,28 +162,11 @@ class ImageBossBuilder
      */
     public function srcset(): array
     {
-        $settings = $this->getSettings();
-        $widths = $this->generateWidths();
-        $result = [];
-
-        foreach ($widths as $width) {
-            $height = $this->calculateHeight($width);
-
-            if (! $settings->source) {
-                $url = $this->generateCraftTransformUrl($width, $height);
-            } else {
-                $path = $this->buildImageBossPath($width, $height);
-                $url = $this->signPath($path);
-            }
-
-            $result[] = [
-                'url' => $url,
-                'width' => $width,
-                'height' => $height,
-            ];
-        }
-
-        return $result;
+        return array_map(fn (int $width) => [
+            'url' => $this->generateUrlForWidth($width),
+            'width' => $width,
+            'height' => $this->calculateHeight($width),
+        ], $this->generateWidths());
     }
 
     public function transform(): TransformResult
@@ -215,14 +176,7 @@ class ImageBossBuilder
 
     public function srcsetString(): string
     {
-        $items = $this->srcset();
-        $parts = [];
-
-        foreach ($items as $item) {
-            $parts[] = "{$item['url']} {$item['width']}w";
-        }
-
-        return implode(', ', $parts);
+        return $this->transform()->srcset();
     }
 
     public function placeholder(?string $color = null): string
@@ -263,6 +217,18 @@ class ImageBossBuilder
         }
 
         return [null, null];
+    }
+
+    private function generateUrlForWidth(int $width): string
+    {
+        $settings = $this->getSettings();
+        $height = $this->calculateHeight($width);
+
+        if (! $settings->source) {
+            return $this->generateCraftTransformUrl($width, $height);
+        }
+
+        return $this->signPath($this->buildImageBossPath($width, $height));
     }
 
     private function buildImageBossPath(int $width, ?int $height): string
