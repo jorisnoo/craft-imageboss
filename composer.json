@@ -1,0 +1,68 @@
+{
+    "name": "jorisnoo/craft-imageboss",
+    "description": "ImageBoss image CDN integration for Craft CMS with native transform fallback",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "license": "MIT",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "imageboss",
+        "image",
+        "responsive",
+        "srcset"
+    ],
+    "support": {
+        "source": "https://github.com/jorisnoo/craft-imageboss",
+        "issues": "https://github.com/jorisnoo/craft-imageboss/issues"
+    },
+    "authors": [
+        {
+            "name": "Joris Noordermeer",
+            "email": "contact@noordermeer.ch",
+            "homepage": "https://github.com/jorisnoo",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "craftcms/cms": "^5.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "mockery/mockery": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Noo\\CraftImageboss\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Noo\\CraftImageboss\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    },
+    "extra": {
+        "name": "ImageBoss",
+        "handle": "imageboss",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "class": "Noo\\CraftImageboss\\Plugin"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
