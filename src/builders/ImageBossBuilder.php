@@ -3,7 +3,6 @@
 namespace Noo\CraftImageboss\builders;
 
 use craft\elements\Asset;
-use craft\fs\Local;
 use craft\helpers\App;
 use Noo\CraftImageboss\contracts\ImagePreset;
 use Noo\CraftImageboss\models\Settings;
@@ -294,20 +293,14 @@ class ImageBossBuilder
 
     private function appendAssetPath(array &$segments): void
     {
-        $settings = $this->getSettings();
         $volume = $this->asset->getVolume();
         $fs = $volume->getFs();
 
-        if ($settings->useCloudSourcePath) {
-            try {
-                if (property_exists($fs, 'subfolder')
-                    && $fs->subfolder !== ''
-                    && ! ($fs instanceof Local)
-                ) {
-                    $segments[] = trim(App::parseEnv($fs->subfolder), '/');
-                }
-            } catch (\Throwable) {
-            }
+        $settings = $this->getSettings();
+
+        if ($settings->includeVolumeFolder && property_exists($fs, 'path') && $fs->path !== '') {
+            $fullPath = trim(App::parseEnv($fs->path), '/');
+            $segments[] = basename($fullPath);
         }
 
         $subpath = $volume->getSubpath();
@@ -315,7 +308,7 @@ class ImageBossBuilder
             $segments[] = trim(App::parseEnv($subpath), '/');
         }
 
-        $segments[] = $this->sanitizePath($this->asset->path);
+        $segments[] = $this->sanitizePath($this->asset->getPath());
     }
 
     /**
@@ -359,11 +352,11 @@ class ImageBossBuilder
     {
         $settings = $this->getSettings();
 
-        if (! $settings->secret) {
+        if (! $settings->token) {
             return $settings->baseUrl . $path;
         }
 
-        $bossToken = hash_hmac('sha256', $path, $settings->secret);
+        $bossToken = hash_hmac('sha256', $path, $settings->token);
 
         return $settings->baseUrl . $path . '?bossToken=' . $bossToken;
     }

@@ -6,10 +6,9 @@ use Noo\CraftImageboss\Tests\TestableImageBossBuilder;
 function createSettings(array $overrides = []): Settings
 {
     $settings = new Settings();
-    $settings->source = $overrides['source'] ?? 'test-source';
-    $settings->secret = $overrides['secret'] ?? null;
+    $settings->source = array_key_exists('source', $overrides) ? $overrides['source'] : 'test-source';
+    $settings->token = $overrides['token'] ?? null;
     $settings->baseUrl = $overrides['baseUrl'] ?? 'https://img.imageboss.me';
-    $settings->useCloudSourcePath = $overrides['useCloudSourcePath'] ?? false;
     $settings->defaultWidth = $overrides['defaultWidth'] ?? 1000;
     $settings->defaultInterval = $overrides['defaultInterval'] ?? 320;
     $settings->presets = $overrides['presets'] ?? [
@@ -30,8 +29,8 @@ function createMockAsset(
     ?int $height = null,
     string $path = 'images/test.jpg',
 ): Mockery\MockInterface {
-    $asset = Mockery::mock(\craft\elements\Asset::class);
-    $asset->path = $path;
+    $asset = Mockery::mock(\craft\elements\Asset::class)->shouldIgnoreMissing();
+    $asset->shouldReceive('getPath')->andReturn($path);
     $asset->shouldReceive('getHasFocalPoint')->andReturn($hasFocalPoint);
 
     if ($hasFocalPoint && $focalPoint) {
@@ -42,6 +41,12 @@ function createMockAsset(
 
     $asset->shouldReceive('getWidth')->andReturn($width);
     $asset->shouldReceive('getHeight')->andReturn($height);
+
+    $fs = Mockery::mock(\craft\base\FsInterface::class)->shouldIgnoreMissing();
+    $volume = Mockery::mock(\craft\models\Volume::class)->shouldIgnoreMissing();
+    $volume->shouldReceive('getFs')->andReturn($fs);
+    $volume->shouldReceive('getSubpath')->andReturn('');
+    $asset->shouldReceive('getVolume')->andReturn($volume);
 
     return $asset;
 }

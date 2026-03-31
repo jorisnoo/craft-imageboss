@@ -16,14 +16,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | ImageBoss Secret
+    | ImageBoss Token
     |--------------------------------------------------------------------------
     |
-    | Optional HMAC secret for signing ImageBoss URLs. When set, all URLs
+    | Optional HMAC token for signing ImageBoss URLs. When set, all URLs
     | will be signed using SHA-256 to prevent URL tampering.
     |
     */
-    'secret' => App::env('IMAGEBOSS_SECRET'),
+    'token' => App::env('IMAGEBOSS_TOKEN'),
 
     /*
     |--------------------------------------------------------------------------
@@ -34,14 +34,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Use Cloud Source Path
+    | Include Volume Folder
     |--------------------------------------------------------------------------
     |
-    | When true, includes the filesystem subfolder in the ImageBoss URL path.
-    | Needed when your ImageBoss source points to a cloud bucket with subfolders.
+    | When true, the last segment of the volume's filesystem path is included
+    | in the ImageBoss URL. Enable this when your ImageBoss source maps to a
+    | parent directory containing multiple volume folders.
     |
     */
-    'useCloudSourcePath' => true,
+    'includeVolumeFolder' => true,
 
     /*
     |--------------------------------------------------------------------------

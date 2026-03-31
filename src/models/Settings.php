@@ -8,11 +8,11 @@ class Settings extends Model
 {
     public ?string $source = null;
 
-    public ?string $secret = null;
+    public ?string $token = null;
 
     public string $baseUrl = 'https://img.imageboss.me';
 
-    public bool $useCloudSourcePath = true;
+    public bool $includeVolumeFolder = true;
 
     public int $defaultWidth = 1000;
 

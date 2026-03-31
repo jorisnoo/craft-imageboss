@@ -78,8 +78,8 @@ it('excludes focal point when asset has none', function () {
 
 // --- Signing ---
 
-it('signs url when secret is configured', function () {
-    $settings = createSettings(['secret' => 'test-secret']);
+it('signs url when token is configured', function () {
+    $settings = createSettings(['token' => 'test-secret']);
     $builder = createBuilder(settings: $settings)->width(800);
 
     $url = $builder->url();
@@ -87,7 +87,7 @@ it('signs url when secret is configured', function () {
     expect($url)->toContain('?bossToken=');
 });
 
-it('does not sign url when no secret', function () {
+it('does not sign url when no token', function () {
     $builder = createBuilder()->width(800);
 
     $url = $builder->url();
@@ -96,7 +96,7 @@ it('does not sign url when no secret', function () {
 });
 
 it('generates correct hmac signature', function () {
-    $settings = createSettings(['secret' => 'test-secret']);
+    $settings = createSettings(['token' => 'test-secret']);
     $builder = createBuilder(settings: $settings)->width(800);
 
     $url = $builder->url();
@@ -504,7 +504,7 @@ it('provides all items from TransformResult', function () {
 });
 
 it('casts TransformResultItem to url string', function () {
-    $result = createBuilder()->width(800)->transform();
+    $result = createBuilder()->min(800)->max(800)->transform();
 
     $last = $result->last();
 
