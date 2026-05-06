@@ -14,7 +14,7 @@ enum InterfacePreset: string implements ImagePreset
     case WithInterval = 'with_interval';
 
     /**
-     * @return array{min: int, max: int, ratio?: float, interval?: int}
+     * @return array{min: int, max: int, ratio?: float, interval?: int, format?: string, quality?: int}
      */
     public function config(): array
     {

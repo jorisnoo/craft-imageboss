@@ -89,6 +89,7 @@ return [
     | - ratio: Aspect ratio as width/height, e.g. 16/9
     | - interval: Width step size, overrides defaultInterval
     | - format: Output format override, e.g. 'jpg'
+    | - quality: Output quality 1-100 (default is provider's own default)
     |
     */
     'presets' => [],

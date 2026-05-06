@@ -53,6 +53,22 @@ it('includes format override in url', function () {
         ->and($url)->not->toContain('format:auto');
 });
 
+it('includes quality in url when set', function () {
+    $builder = createBuilder()->width(800)->quality(90);
+
+    $url = $builder->url();
+
+    expect($url)->toContain('quality:90');
+});
+
+it('omits quality from url by default', function () {
+    $builder = createBuilder()->width(800);
+
+    $url = $builder->url();
+
+    expect($url)->not->toContain('quality:');
+});
+
 // --- Focal points ---
 
 it('includes focal point in url', function () {
@@ -147,6 +163,15 @@ it('applies format from preset', function () {
 
     expect($url)->toContain('format:jpg')
         ->and($url)->not->toContain('format:auto');
+});
+
+it('applies quality from preset', function () {
+    $settings = createSettings(['presets' => ['hd' => ['min' => 800, 'max' => 800, 'quality' => 90]]]);
+    $builder = createBuilder(settings: $settings)->preset('hd');
+
+    $url = $builder->url();
+
+    expect($url)->toContain('quality:90');
 });
 
 it('ignores unknown preset', function () {
@@ -335,7 +360,7 @@ it('returns empty values from null builder', function () {
 it('allows chaining on null builder', function () {
     $builder = new NullImageBossBuilder();
 
-    $result = $builder->width(800)->height(600)->ratio(16 / 9)->min(320)->max(2560)->interval(320)->url();
+    $result = $builder->width(800)->height(600)->ratio(16 / 9)->min(320)->max(2560)->interval(320)->quality(90)->url();
 
     expect($result)->toBe('');
 });
@@ -356,7 +381,8 @@ it('ignores null values passed to setter methods', function () {
         ->min(300)
         ->max(null)
         ->interval(null)
-        ->format(null);
+        ->format(null)
+        ->quality(null);
 
     $url = $builder->url();
 
@@ -419,6 +445,20 @@ it('passes format in fallback', function () {
     $url = $builder->url();
 
     expect($url)->toBe('/transforms/test_800.webp');
+});
+
+it('passes quality in fallback', function () {
+    $settings = createSettings(['source' => null]);
+    $asset = createMockAsset();
+    $asset->shouldReceive('getUrl')
+        ->with(['width' => 800, 'quality' => 90])
+        ->andReturn('/transforms/test_800.jpg');
+
+    $builder = createBuilder($asset, $settings)->width(800)->quality(90);
+
+    $url = $builder->url();
+
+    expect($url)->toBe('/transforms/test_800.jpg');
 });
 
 it('generates srcset in fallback mode', function () {

@@ -26,6 +26,8 @@ class ImageBossBuilder
 
     private ?string $format = null;
 
+    private ?int $quality = null;
+
     public function __construct(Asset $asset)
     {
         $this->asset = $asset;
@@ -108,6 +110,17 @@ class ImageBossBuilder
         return $this;
     }
 
+    public function quality(?int $quality): static
+    {
+        if ($quality === null || $quality < 1) {
+            return $this;
+        }
+
+        $this->quality = $quality;
+
+        return $this;
+    }
+
     public function aspectRatio(): ?float
     {
         if ($this->ratio) {
@@ -141,7 +154,7 @@ class ImageBossBuilder
             return $this;
         }
 
-        foreach (['min', 'max', 'ratio', 'interval', 'format'] as $key) {
+        foreach (['min', 'max', 'ratio', 'interval', 'format', 'quality'] as $key) {
             if (isset($config[$key])) {
                 $this->$key = $config[$key];
             }
@@ -250,6 +263,11 @@ class ImageBossBuilder
         }
 
         $opts[] = 'format:' . ($this->format ?? 'auto');
+
+        if ($this->quality !== null) {
+            $opts[] = "quality:{$this->quality}";
+        }
+
         $segments[] = implode(',', $opts);
 
         $this->appendAssetPath($segments);
@@ -309,6 +327,10 @@ class ImageBossBuilder
 
         if ($this->format) {
             $params['format'] = $this->format;
+        }
+
+        if ($this->quality !== null) {
+            $params['quality'] = $this->quality;
         }
 
         return $this->asset->getUrl($params) ?? '';

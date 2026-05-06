@@ -43,6 +43,11 @@ class NullImageBossBuilder extends ImageBossBuilder
         return $this;
     }
 
+    public function quality(?int $quality): static
+    {
+        return $this;
+    }
+
     public function preset(ImagePreset|\BackedEnum|string $preset): static
     {
         return $this;

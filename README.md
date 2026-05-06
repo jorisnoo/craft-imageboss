@@ -67,6 +67,7 @@ Define presets in `config/imageboss.php`:
         'max' => 1200,
         'ratio' => 1200 / 630,
         'format' => 'jpg', // output format (optional)
+        'quality' => 90,   // output quality 1-100 (optional)
     ],
 ],
 ```
@@ -208,6 +209,7 @@ $placeholder = $builder->width(800)->ratio(16/9)->placeholder();
 | `max(int)` | Maximum width for srcset |
 | `interval(int)` | Width step for srcset |
 | `format(string)` | Output format override |
+| `quality(int)` | Output quality 1-100 |
 | `preset(string\|BackedEnum\|ImagePreset)` | Apply preset configuration |
 | `url()` | Generate single URL |
 | `srcset()` | Generate srcset array |
