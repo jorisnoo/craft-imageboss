@@ -240,6 +240,8 @@ When an asset has a focal point set, it's automatically included in the URL:
 https://img.imageboss.me/your-source/cover/800x450/fp-x:0.25,fp-y:0.75,format:auto/assets/image.jpg
 ```
 
+Assets without a focal point default to center (`fp-x:0.5,fp-y:0.5`) so cover crops stay centred instead of falling back to ImageBoss's smart-crop.
+
 ## Features
 
 - Responsive srcset generation with configurable width ranges and intervals

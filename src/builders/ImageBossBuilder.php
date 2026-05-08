@@ -256,12 +256,9 @@ class ImageBossBuilder
         }
 
         $opts = [];
-        $focalPoint = $this->getFocalPoint();
+        $focalPoint = $this->getFocalPoint() ?? ['x' => 0.5, 'y' => 0.5];
 
-        if ($focalPoint) {
-            $opts[] = "fp-x:{$focalPoint['x']},fp-y:{$focalPoint['y']}";
-        }
-
+        $opts[] = "fp-x:{$focalPoint['x']},fp-y:{$focalPoint['y']}";
         $opts[] = 'format:' . ($this->format ?? 'auto');
 
         if ($this->quality !== null) {

@@ -81,15 +81,14 @@ it('includes focal point in url', function () {
     expect($url)->toContain('fp-x:0.25,fp-y:0.75');
 });
 
-it('excludes focal point when asset has none', function () {
+it('defaults to center when asset has no focal point', function () {
     $asset = createMockAsset(hasFocalPoint: false);
 
     $builder = createBuilder($asset)->width(800);
 
     $url = $builder->url();
 
-    expect($url)->not->toContain('fp-x')
-        ->and($url)->not->toContain('fp-y');
+    expect($url)->toContain('fp-x:0.5,fp-y:0.5');
 });
 
 // --- Signing ---
