@@ -132,9 +132,6 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {# Custom srcset range #}
 {{ imageboss.from(asset).min(300).max(1200).interval(200).srcsetString() }}
 
-{# CSS image-set() for responsive backgrounds #}
-{{ imageboss.from(asset).preset('hero').imageSet() }}
-
 {# Placeholder for lazy loading #}
 {{ imageboss.from(asset).width(800).ratio(16/9).placeholder() }}
 {{ imageboss.from(asset).preset('card').placeholder('#f0f0f0') }}
@@ -146,13 +143,11 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {# With preset name #}
 {{ imageboss.url(asset, 'hero') }}
 {{ imageboss.srcset(asset, 'hero') }}
-{{ imageboss.imageSet(asset, 'hero') }}
 {{ imageboss.placeholder(asset, 'card') }}
 
 {# With options array #}
 {{ imageboss.url(asset, { width: 800, height: 600, format: 'webp' }) }}
 {{ imageboss.srcset(asset, { min: 300, max: 1200, interval: 200 }) }}
-{{ imageboss.imageSet(asset, { min: 400, max: 1200, interval: 400 }) }}
 {{ imageboss.placeholder(asset, { preset: 'card', color: '#e0e0e0' }) }}
 ```
 
@@ -161,7 +156,6 @@ The plugin registers an `imageboss` template variable and Twig filters.
 ```twig
 {{ asset | imageboss_url({ width: 800 }) }}
 {{ asset | imageboss_srcset('hero') }}
-{{ asset | imageboss_image_set('hero') }}
 {{ asset | imageboss_placeholder({ color: '#e0e0e0' }) }}
 ```
 
@@ -220,8 +214,7 @@ $placeholder = $builder->width(800)->ratio(16/9)->placeholder();
 | `url()` | Generate single URL |
 | `srcset()` | Generate srcset array |
 | `srcsetString()` | Generate srcset string |
-| `imageSet(?int $baseWidth)` | Generate CSS `image-set()` string (defaults to smallest width as `1x`) |
-| `transform()` | Get `TransformResult` with `first()`, `last()`, `all()`, `srcset()`, `imageSet()` |
+| `transform()` | Get `TransformResult` with `first()`, `last()`, `all()` |
 | `placeholder(?string $color)` | Generate SVG data-URI placeholder |
 | `aspectRatio()` | Get resolved aspect ratio |
 
@@ -239,12 +232,6 @@ https://img.imageboss.me/your-source/width/800/format:auto/assets/image.jpg
 
 ```
 https://img.imageboss.me/.../width/640/... 640w, https://img.imageboss.me/.../width/1280/... 1280w
-```
-
-`imageSet()` returns a CSS `image-set()` value for `background-image`, using the smallest width as `1x`:
-
-```css
-background-image: image-set(url("https://img.imageboss.me/.../width/400/...") 1x, url("https://img.imageboss.me/.../width/800/...") 2x);
 ```
 
 When an asset has a focal point set, it's automatically included in the URL:

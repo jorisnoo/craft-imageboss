@@ -49,28 +49,6 @@ class TransformResult implements \Stringable
         return implode(', ', $parts);
     }
 
-    public function imageSet(?int $baseWidth = null): string
-    {
-        if (empty($this->items)) {
-            return '';
-        }
-
-        $base = $baseWidth ?? $this->items[array_key_first($this->items)]['width'];
-
-        if ($base < 1) {
-            return '';
-        }
-
-        $parts = [];
-
-        foreach ($this->items as $item) {
-            $density = round($item['width'] / $base, 2);
-            $parts[] = sprintf('url("%s") %sx', $item['url'], $density);
-        }
-
-        return 'image-set(' . implode(', ', $parts) . ')';
-    }
-
     public function __toString(): string
     {
         return $this->srcset();

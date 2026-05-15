@@ -28,13 +28,6 @@ class ImageBossVariable
         return $this->applyOptions($this->from($asset), $options)->srcsetString();
     }
 
-    public function imageSet(?Asset $asset, string|array $options = []): string
-    {
-        $baseWidth = is_array($options) ? ($options['baseWidth'] ?? null) : null;
-
-        return $this->applyOptions($this->from($asset), $options)->imageSet($baseWidth);
-    }
-
     public function transform(?Asset $asset, string|array $options = []): TransformResult
     {
         return $this->applyOptions($this->from($asset), $options)->transform();

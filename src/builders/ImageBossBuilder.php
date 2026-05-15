@@ -192,11 +192,6 @@ class ImageBossBuilder
         return $this->transform()->srcset();
     }
 
-    public function imageSet(?int $baseWidth = null): string
-    {
-        return $this->transform()->imageSet($baseWidth);
-    }
-
     public function placeholder(?string $color = null): string
     {
         [$width, $height] = $this->resolvePlaceholderDimensions();
