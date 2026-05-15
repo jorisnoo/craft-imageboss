@@ -71,6 +71,11 @@ class NullImageBossBuilder extends ImageBossBuilder
         return '';
     }
 
+    public function imageSet(?int $baseWidth = null): string
+    {
+        return '';
+    }
+
     public function transform(): TransformResult
     {
         return new TransformResult([]);

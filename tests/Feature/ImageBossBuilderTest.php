@@ -591,6 +591,51 @@ it('returns null first and last from empty TransformResult', function () {
         ->and((string) $result)->toBe('');
 });
 
+// --- image-set() ---
+
+it('generates image-set with density descriptors from smallest width', function () {
+    $imageSet = createBuilder()->min(400)->max(1200)->interval(400)->imageSet();
+
+    expect($imageSet)->toStartWith('image-set(')
+        ->and($imageSet)->toEndWith(')')
+        ->and($imageSet)->toContain('1x')
+        ->and($imageSet)->toContain('2x')
+        ->and($imageSet)->toContain('3x')
+        ->and($imageSet)->toContain('width/400')
+        ->and($imageSet)->toContain('width/800')
+        ->and($imageSet)->toContain('width/1200');
+});
+
+it('supports fractional density descriptors', function () {
+    $imageSet = createBuilder()->min(400)->max(600)->interval(200)->imageSet();
+
+    expect($imageSet)->toContain('1x')
+        ->and($imageSet)->toContain('1.5x');
+});
+
+it('accepts a custom base width for image-set', function () {
+    $imageSet = createBuilder()->min(400)->max(800)->interval(400)->imageSet(800);
+
+    expect($imageSet)->toContain('0.5x')
+        ->and($imageSet)->toContain('1x');
+});
+
+it('wraps urls in image-set with double quotes', function () {
+    $imageSet = createBuilder()->min(400)->max(400)->imageSet();
+
+    expect($imageSet)->toMatch('/url\(".+?"\) 1x/');
+});
+
+it('returns empty string from imageSet on NullImageBossBuilder', function () {
+    expect((new NullImageBossBuilder())->imageSet())->toBe('');
+});
+
+it('returns empty string from TransformResult imageSet when empty', function () {
+    $result = (new NullImageBossBuilder())->transform();
+
+    expect($result->imageSet())->toBe('');
+});
+
 // --- Placeholder with color ---
 
 it('generates placeholder with color', function () {
