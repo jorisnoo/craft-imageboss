@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.1) (2026-05-16)
+
+### ⚠ BREAKING CHANGES
+
+- remove imageSet() method for CSS image-set() backgrounds ([04f4c29](https://github.com/jorisnoo/craft-imageboss/commit/04f4c29b64be53d8a0f3e69f2ab5d41662434819))
+
+### Features
+
+- add cdn() method for passthrough URLs ([60b8540](https://github.com/jorisnoo/craft-imageboss/commit/60b8540166e51bbc86f1c718873c9baf1e3cabf9))
+- remove imageSet() method for CSS image-set() backgrounds ([04f4c29](https://github.com/jorisnoo/craft-imageboss/commit/04f4c29b64be53d8a0f3e69f2ab5d41662434819))
+- add imageSet() method for CSS image-set() responsive backgrounds ([ac72d5a](https://github.com/jorisnoo/craft-imageboss/commit/ac72d5a6584710062f5905e64be85c8e73b03b39))
+
+### Chores
+
+- add MIT license ([473aae9](https://github.com/jorisnoo/craft-imageboss/commit/473aae989f62d8add9db19a0a09c4d8e346bd381))
 ## [1.0.0](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.0) (2026-05-12)
 
 ### Features
