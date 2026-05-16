@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.2) (2026-05-16)
+
+### Features
+
+- add download option to force browser downloads ([9e43c18](https://github.com/jorisnoo/craft-imageboss/commit/9e43c18659924f722e17bdb2f865a9092424bcc8))
+- add compression option to cdn() method ([73b09ab](https://github.com/jorisnoo/craft-imageboss/commit/73b09aba5e800011e571c7a500187a13e929593a))
+
+### Documentation
+
+- document cache purging feature ([45637a0](https://github.com/jorisnoo/craft-imageboss/commit/45637a000c755b7d5f11edb820d3ded92b7b5157))
 ## [1.0.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.1) (2026-05-16)
 
 ### ⚠ BREAKING CHANGES
