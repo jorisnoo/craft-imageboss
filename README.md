@@ -25,7 +25,8 @@ Set your ImageBoss credentials in `.env`:
 
 ```env
 IMAGEBOSS_SOURCE=your-source
-IMAGEBOSS_TOKEN=your-token  # optional, for URL signing
+IMAGEBOSS_TOKEN=your-token    # optional, for URL signing
+IMAGEBOSS_API_KEY=your-key    # optional, for cache purging
 ```
 
 When `IMAGEBOSS_SOURCE` is not set, the plugin falls back to Craft's native image transforms.
@@ -36,6 +37,7 @@ When `IMAGEBOSS_SOURCE` is not set, the plugin falls back to Craft's native imag
 |--------|---------|-------------|
 | `source` | `null` | ImageBoss source identifier |
 | `token` | `null` | HMAC token for URL signing |
+| `apiKey` | `null` | API key for cache purging |
 | `baseUrl` | `https://img.imageboss.me` | ImageBoss CDN base URL |
 | `includeVolumeFolder` | `true` | Include volume folder name in URL path |
 | `defaultWidth` | `1000` | Default width for `url()` |
@@ -112,6 +114,10 @@ Preset::Hero->max();      // 3840
 Preset::Card->ratio();    // 0.8
 Preset::Thumbnail->interval(); // 250
 ```
+
+### Cache Purging
+
+When `IMAGEBOSS_API_KEY` is set, the plugin listens for Craft's `EVENT_AFTER_REPLACE_ASSET` and queues a job that sends a `DELETE` request to the asset's ImageBoss URL. ImageBoss then clears all cached variants of the master image. See the [ImageBoss caching docs](https://imageboss.me/docs/api/caching) for details.
 
 ## Usage
 
