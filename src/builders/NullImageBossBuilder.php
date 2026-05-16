@@ -58,7 +58,7 @@ class NullImageBossBuilder extends ImageBossBuilder
         return '';
     }
 
-    public function cdn(): string
+    public function cdn(array $options = []): string
     {
         return '';
     }

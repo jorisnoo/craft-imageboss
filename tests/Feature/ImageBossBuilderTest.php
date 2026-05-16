@@ -559,6 +559,29 @@ it('returns empty string from null builder cdn', function () {
     expect($builder->cdn())->toBe('');
 });
 
+it('includes compression:false in cdn url when option is set', function () {
+    $asset = createMockAsset(path: 'logos/brand.svg');
+    $url = createBuilder($asset)->cdn(['compression' => false]);
+
+    expect($url)->toContain('/cdn/compression:false/')
+        ->and($url)->toEndWith('logos/brand.svg');
+});
+
+it('includes compression:true in cdn url when option is set', function () {
+    $asset = createMockAsset(path: 'logos/brand.svg');
+    $url = createBuilder($asset)->cdn(['compression' => true]);
+
+    expect($url)->toContain('/cdn/compression:true/');
+});
+
+it('omits options segment from cdn url when no options are provided', function () {
+    $asset = createMockAsset(path: 'logos/brand.svg');
+    $url = createBuilder($asset)->cdn();
+
+    expect($url)->toContain('/cdn/logos/brand.svg')
+        ->and($url)->not->toContain('compression:');
+});
+
 // --- TransformResult ---
 
 it('returns TransformResult from transform()', function () {

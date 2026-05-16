@@ -134,6 +134,7 @@ The plugin registers an `imageboss` template variable and Twig filters.
 
 {# CDN passthrough (no transform, useful for SVG and other vector formats) #}
 {{ imageboss.from(asset).cdn() }}
+{{ imageboss.from(asset).cdn({ compression: false }) }}
 
 {# Placeholder for lazy loading #}
 {{ imageboss.from(asset).width(800).ratio(16/9).placeholder() }}
@@ -148,6 +149,7 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {{ imageboss.srcset(asset, 'hero') }}
 {{ imageboss.placeholder(asset, 'card') }}
 {{ imageboss.cdn(asset) }}
+{{ imageboss.cdn(asset, { compression: false }) }}
 
 {# With options array #}
 {{ imageboss.url(asset, { width: 800, height: 600, format: 'webp' }) }}
@@ -220,7 +222,7 @@ $placeholder = $builder->width(800)->ratio(16/9)->placeholder();
 | `srcset()` | Generate srcset array |
 | `srcsetString()` | Generate srcset string |
 | `transform()` | Get `TransformResult` with `first()`, `last()`, `all()` |
-| `cdn()` | Generate passthrough URL via ImageBoss `cdn` operation (no transform). Falls back to the asset's native URL when no source is configured. |
+| `cdn(array $options = [])` | Generate passthrough URL via ImageBoss `cdn` operation (no transform). Falls back to the asset's native URL when no source is configured. Pass `['compression' => false]` to disable ImageBoss compression (useful for SVG). |
 | `placeholder(?string $color)` | Generate SVG data-URI placeholder |
 | `aspectRatio()` | Get resolved aspect ratio |
 

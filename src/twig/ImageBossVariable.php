@@ -23,9 +23,12 @@ class ImageBossVariable
         return $this->applyOptions($this->from($asset), $options)->url();
     }
 
-    public function cdn(?Asset $asset): string
+    /**
+     * @param  array{compression?: bool}  $options
+     */
+    public function cdn(?Asset $asset, array $options = []): string
     {
-        return $this->from($asset)->cdn();
+        return $this->from($asset)->cdn($options);
     }
 
     public function srcset(?Asset $asset, string|array $options = []): string

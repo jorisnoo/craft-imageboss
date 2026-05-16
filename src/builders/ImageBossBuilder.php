@@ -170,7 +170,10 @@ class ImageBossBuilder
         return $this->generateUrlForWidth($width);
     }
 
-    public function cdn(): string
+    /**
+     * @param  array{compression?: bool}  $options
+     */
+    public function cdn(array $options = []): string
     {
         $settings = $this->getSettings();
 
@@ -179,6 +182,17 @@ class ImageBossBuilder
         }
 
         $segments = ['', $settings->source, 'cdn'];
+
+        $opts = [];
+
+        if (array_key_exists('compression', $options)) {
+            $opts[] = 'compression:' . ($options['compression'] ? 'true' : 'false');
+        }
+
+        if (! empty($opts)) {
+            $segments[] = implode(',', $opts);
+        }
+
         $this->appendAssetPath($segments);
 
         return $this->signPath(implode('/', $segments));
