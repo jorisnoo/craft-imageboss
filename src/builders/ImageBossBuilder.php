@@ -178,9 +178,22 @@ class ImageBossBuilder
 
     public function url(): string
     {
+        if ($this->download !== null && ! $this->hasTransformDimensions()) {
+            return $this->cdn();
+        }
+
         $width = $this->width ?? $this->getSettings()->defaultWidth;
 
         return $this->generateUrlForWidth($width);
+    }
+
+    private function hasTransformDimensions(): bool
+    {
+        return $this->width !== null
+            || $this->height !== null
+            || $this->ratio !== null
+            || $this->min !== null
+            || $this->max !== null;
     }
 
     /**

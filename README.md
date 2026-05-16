@@ -142,7 +142,9 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {{ imageboss.from(asset).cdn() }}
 {{ imageboss.from(asset).cdn({ compression: false }) }}
 
-{# Force browser download (works with any operation, not just cdn) #}
+{# Force browser download (standalone or combined with any operation) #}
+{{ imageboss.from(asset).download(true).url() }}
+{{ imageboss.from(asset).download('annual-report.pdf').url() }}
 {{ imageboss.from(asset).width(800).download(true).url() }}
 {{ imageboss.from(asset).download('annual-report.pdf').cdn() }}
 

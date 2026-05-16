@@ -605,6 +605,43 @@ it('omits download from url when download is false or null', function () {
         ->and($urlNone)->not->toContain('download:');
 });
 
+it('generates cdn download url when only download is set', function () {
+    $asset = createMockAsset(path: 'docs/report.pdf');
+    $url = createBuilder($asset)->download(true)->url();
+
+    expect($url)->toBe('https://img.imageboss.me/test-source/cdn/download:1/docs/report.pdf');
+});
+
+it('generates cdn download url with custom filename', function () {
+    $asset = createMockAsset(path: 'docs/report.pdf');
+    $url = createBuilder($asset)->download('annual-report.pdf')->url();
+
+    expect($url)->toBe('https://img.imageboss.me/test-source/cdn/download:annual-report.pdf/docs/report.pdf');
+});
+
+it('falls back to asset url for cdn download when no source is configured', function () {
+    $asset = createMockAsset(path: 'docs/report.pdf');
+    $asset->shouldReceive('getUrl')->andReturn('/uploads/docs/report.pdf');
+
+    $url = createBuilder($asset, createSettings(['source' => null]))->download(true)->url();
+
+    expect($url)->toBe('/uploads/docs/report.pdf');
+});
+
+it('signs cdn download url when token is set', function () {
+    $asset = createMockAsset(path: 'docs/report.pdf');
+    $url = createBuilder($asset, createSettings(['token' => 'secret']))->download(true)->url();
+
+    expect($url)->toContain('/test-source/cdn/download:1/docs/report.pdf?bossToken=');
+});
+
+it('still applies width transform when download is combined with width', function () {
+    $url = createBuilder()->width(800)->download(true)->url();
+
+    expect($url)->toContain('width/800')
+        ->and($url)->toContain('download:1');
+});
+
 it('includes download in cdn url when chained on builder', function () {
     $asset = createMockAsset(path: 'docs/report.pdf');
     $url = createBuilder($asset)->download(true)->cdn();
