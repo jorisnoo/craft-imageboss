@@ -170,6 +170,20 @@ class ImageBossBuilder
         return $this->generateUrlForWidth($width);
     }
 
+    public function cdn(): string
+    {
+        $settings = $this->getSettings();
+
+        if (! $settings->source) {
+            return $this->asset->getUrl() ?? '';
+        }
+
+        $segments = ['', $settings->source, 'cdn'];
+        $this->appendAssetPath($segments);
+
+        return $this->signPath(implode('/', $segments));
+    }
+
     /**
      * @return array<int, array{url: string, width: int, height: ?int}>
      */

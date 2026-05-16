@@ -58,6 +58,11 @@ class NullImageBossBuilder extends ImageBossBuilder
         return '';
     }
 
+    public function cdn(): string
+    {
+        return '';
+    }
+
     /**
      * @return array<int, array{url: string, width: int, height: ?int}>
      */

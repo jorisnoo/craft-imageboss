@@ -20,6 +20,7 @@ class ImageBossTwigExtension extends AbstractExtension
         return [
             new TwigFilter('imageboss_srcset', [$this->variable, 'srcset']),
             new TwigFilter('imageboss_url', [$this->variable, 'url']),
+            new TwigFilter('imageboss_cdn', [$this->variable, 'cdn']),
             new TwigFilter('imageboss_placeholder', [$this->variable, 'placeholder']),
         ];
     }

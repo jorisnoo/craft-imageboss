@@ -510,6 +510,55 @@ it('sanitizes path with double dots', function () {
         ->and($url)->toContain('secret/test.jpg');
 });
 
+// --- CDN operation ---
+
+it('generates cdn url with source and asset path', function () {
+    $asset = createMockAsset(path: 'logos/brand.svg');
+    $url = createBuilder($asset)->cdn();
+
+    expect($url)->toContain('https://img.imageboss.me')
+        ->and($url)->toContain('test-source')
+        ->and($url)->toContain('/cdn/')
+        ->and($url)->toEndWith('logos/brand.svg');
+});
+
+it('cdn url omits transform options', function () {
+    $asset = createMockAsset(path: 'logos/brand.svg');
+    $url = createBuilder($asset)->width(800)->format('webp')->quality(90)->cdn();
+
+    expect($url)->not->toContain('width/')
+        ->and($url)->not->toContain('cover/')
+        ->and($url)->not->toContain('format:')
+        ->and($url)->not->toContain('quality:')
+        ->and($url)->not->toContain('fp-x:');
+});
+
+it('signs cdn url when token is configured', function () {
+    $settings = createSettings(['token' => 'test-secret']);
+    $url = createBuilder(settings: $settings)->cdn();
+
+    $parsed = parse_url($url);
+    parse_str($parsed['query'] ?? '', $query);
+
+    expect($query['bossToken'])->toBe(hash_hmac('sha256', $parsed['path'], 'test-secret'));
+});
+
+it('falls back to asset getUrl when no source configured', function () {
+    $settings = createSettings(['source' => null]);
+    $asset = createMockAsset();
+    $asset->shouldReceive('getUrl')->withNoArgs()->andReturn('/uploads/logo.svg');
+
+    $url = createBuilder($asset, $settings)->cdn();
+
+    expect($url)->toBe('/uploads/logo.svg');
+});
+
+it('returns empty string from null builder cdn', function () {
+    $builder = new NullImageBossBuilder();
+
+    expect($builder->cdn())->toBe('');
+});
+
 // --- TransformResult ---
 
 it('returns TransformResult from transform()', function () {

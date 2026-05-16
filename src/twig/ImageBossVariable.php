@@ -23,6 +23,11 @@ class ImageBossVariable
         return $this->applyOptions($this->from($asset), $options)->url();
     }
 
+    public function cdn(?Asset $asset): string
+    {
+        return $this->from($asset)->cdn();
+    }
+
     public function srcset(?Asset $asset, string|array $options = []): string
     {
         return $this->applyOptions($this->from($asset), $options)->srcsetString();

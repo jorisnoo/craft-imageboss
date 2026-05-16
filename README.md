@@ -132,6 +132,9 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {# Custom srcset range #}
 {{ imageboss.from(asset).min(300).max(1200).interval(200).srcsetString() }}
 
+{# CDN passthrough (no transform, useful for SVG and other vector formats) #}
+{{ imageboss.from(asset).cdn() }}
+
 {# Placeholder for lazy loading #}
 {{ imageboss.from(asset).width(800).ratio(16/9).placeholder() }}
 {{ imageboss.from(asset).preset('card').placeholder('#f0f0f0') }}
@@ -144,6 +147,7 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {{ imageboss.url(asset, 'hero') }}
 {{ imageboss.srcset(asset, 'hero') }}
 {{ imageboss.placeholder(asset, 'card') }}
+{{ imageboss.cdn(asset) }}
 
 {# With options array #}
 {{ imageboss.url(asset, { width: 800, height: 600, format: 'webp' }) }}
@@ -156,6 +160,7 @@ The plugin registers an `imageboss` template variable and Twig filters.
 ```twig
 {{ asset | imageboss_url({ width: 800 }) }}
 {{ asset | imageboss_srcset('hero') }}
+{{ asset | imageboss_cdn }}
 {{ asset | imageboss_placeholder({ color: '#e0e0e0' }) }}
 ```
 
@@ -215,6 +220,7 @@ $placeholder = $builder->width(800)->ratio(16/9)->placeholder();
 | `srcset()` | Generate srcset array |
 | `srcsetString()` | Generate srcset string |
 | `transform()` | Get `TransformResult` with `first()`, `last()`, `all()` |
+| `cdn()` | Generate passthrough URL via ImageBoss `cdn` operation (no transform). Falls back to the asset's native URL when no source is configured. |
 | `placeholder(?string $color)` | Generate SVG data-URI placeholder |
 | `aspectRatio()` | Get resolved aspect ratio |
 
