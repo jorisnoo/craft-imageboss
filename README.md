@@ -132,9 +132,13 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {# Custom srcset range #}
 {{ imageboss.from(asset).min(300).max(1200).interval(200).srcsetString() }}
 
-{# CDN passthrough (no transform, useful for SVG and other vector formats) #}
+{# CDN passthrough (no transform) #}
 {{ imageboss.from(asset).cdn() }}
 {{ imageboss.from(asset).cdn({ compression: false }) }}
+
+{# Force browser download (works with any operation, not just cdn) #}
+{{ imageboss.from(asset).width(800).download(true).url() }}
+{{ imageboss.from(asset).download('annual-report.pdf').cdn() }}
 
 {# Placeholder for lazy loading #}
 {{ imageboss.from(asset).width(800).ratio(16/9).placeholder() }}
@@ -217,12 +221,13 @@ $placeholder = $builder->width(800)->ratio(16/9)->placeholder();
 | `interval(int)` | Width step for srcset |
 | `format(string)` | Output format override |
 | `quality(int)` | Output quality 1-100 |
+| `download(bool\|string)` | Force browser download. `true` keeps the original filename, a string sets a custom one. |
 | `preset(string\|BackedEnum\|ImagePreset)` | Apply preset configuration |
 | `url()` | Generate single URL |
 | `srcset()` | Generate srcset array |
 | `srcsetString()` | Generate srcset string |
 | `transform()` | Get `TransformResult` with `first()`, `last()`, `all()` |
-| `cdn(array $options = [])` | Generate passthrough URL via ImageBoss `cdn` operation (no transform). Falls back to the asset's native URL when no source is configured. Pass `['compression' => false]` to disable ImageBoss compression (useful for SVG). |
+| `cdn(array $options = [])` | Generate passthrough URL via ImageBoss `cdn` operation (no transform). Falls back to the asset's native URL when no source is configured. Pass `['compression' => false]` to disable ImageBoss compression. |
 | `placeholder(?string $color)` | Generate SVG data-URI placeholder |
 | `aspectRatio()` | Get resolved aspect ratio |
 

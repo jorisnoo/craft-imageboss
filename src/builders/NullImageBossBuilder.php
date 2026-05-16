@@ -48,6 +48,11 @@ class NullImageBossBuilder extends ImageBossBuilder
         return $this;
     }
 
+    public function download(bool|string|null $download): static
+    {
+        return $this;
+    }
+
     public function preset(ImagePreset|\BackedEnum|string $preset): static
     {
         return $this;

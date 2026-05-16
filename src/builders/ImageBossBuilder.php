@@ -28,6 +28,8 @@ class ImageBossBuilder
 
     private ?int $quality = null;
 
+    private ?string $download = null;
+
     public function __construct(Asset $asset)
     {
         $this->asset = $asset;
@@ -121,6 +123,17 @@ class ImageBossBuilder
         return $this;
     }
 
+    public function download(bool|string|null $download): static
+    {
+        if ($download === null || $download === false) {
+            return $this;
+        }
+
+        $this->download = is_string($download) ? $download : '1';
+
+        return $this;
+    }
+
     public function aspectRatio(): ?float
     {
         if ($this->ratio) {
@@ -187,6 +200,10 @@ class ImageBossBuilder
 
         if (array_key_exists('compression', $options)) {
             $opts[] = 'compression:' . ($options['compression'] ? 'true' : 'false');
+        }
+
+        if ($this->download !== null) {
+            $opts[] = "download:{$this->download}";
         }
 
         if (! empty($opts)) {
@@ -291,6 +308,10 @@ class ImageBossBuilder
 
         if ($this->quality !== null) {
             $opts[] = "quality:{$this->quality}";
+        }
+
+        if ($this->download !== null) {
+            $opts[] = "download:{$this->download}";
         }
 
         $segments[] = implode(',', $opts);

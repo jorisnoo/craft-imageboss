@@ -579,7 +579,45 @@ it('omits options segment from cdn url when no options are provided', function (
     $url = createBuilder($asset)->cdn();
 
     expect($url)->toContain('/cdn/logos/brand.svg')
-        ->and($url)->not->toContain('compression:');
+        ->and($url)->not->toContain('compression:')
+        ->and($url)->not->toContain('download:');
+});
+
+it('includes download:1 in url when download(true) is set', function () {
+    $url = createBuilder()->width(800)->download(true)->url();
+
+    expect($url)->toContain('download:1');
+});
+
+it('includes custom filename in url when download is a string', function () {
+    $url = createBuilder()->width(800)->download('annual-report.pdf')->url();
+
+    expect($url)->toContain('download:annual-report.pdf');
+});
+
+it('omits download from url when download is false or null', function () {
+    $urlFalse = createBuilder()->width(800)->download(false)->url();
+    $urlNull = createBuilder()->width(800)->download(null)->url();
+    $urlNone = createBuilder()->width(800)->url();
+
+    expect($urlFalse)->not->toContain('download:')
+        ->and($urlNull)->not->toContain('download:')
+        ->and($urlNone)->not->toContain('download:');
+});
+
+it('includes download in cdn url when chained on builder', function () {
+    $asset = createMockAsset(path: 'docs/report.pdf');
+    $url = createBuilder($asset)->download(true)->cdn();
+
+    expect($url)->toContain('/cdn/download:1/')
+        ->and($url)->toEndWith('docs/report.pdf');
+});
+
+it('combines compression option and download builder method in cdn url', function () {
+    $asset = createMockAsset(path: 'logos/brand.svg');
+    $url = createBuilder($asset)->download(true)->cdn(['compression' => false]);
+
+    expect($url)->toContain('/cdn/compression:false,download:1/');
 });
 
 // --- TransformResult ---
