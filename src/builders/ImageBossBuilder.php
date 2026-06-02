@@ -28,6 +28,8 @@ class ImageBossBuilder
 
     private ?int $quality = null;
 
+    private bool $animation = false;
+
     private ?string $download = null;
 
     public function __construct(Asset $asset)
@@ -123,6 +125,17 @@ class ImageBossBuilder
         return $this;
     }
 
+    public function animation(?bool $animation = true): static
+    {
+        if (! $animation) {
+            return $this;
+        }
+
+        $this->animation = true;
+
+        return $this;
+    }
+
     public function download(bool|string|null $download): static
     {
         if ($download === null || $download === false) {
@@ -167,7 +180,7 @@ class ImageBossBuilder
             return $this;
         }
 
-        foreach (['min', 'max', 'ratio', 'interval', 'format', 'quality'] as $key) {
+        foreach (['min', 'max', 'ratio', 'interval', 'format', 'quality', 'animation'] as $key) {
             if (isset($config[$key])) {
                 $this->$key = $config[$key];
             }
@@ -321,6 +334,10 @@ class ImageBossBuilder
 
         if ($this->quality !== null) {
             $opts[] = "quality:{$this->quality}";
+        }
+
+        if ($this->animation) {
+            $opts[] = 'animation:true';
         }
 
         if ($this->download !== null) {

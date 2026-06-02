@@ -148,6 +148,10 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {{ imageboss.from(asset).width(800).download(true).url() }}
 {{ imageboss.from(asset).download('annual-report.pdf').cdn() }}
 
+{# Animated GIFs (by default only the first frame is processed) #}
+{{ imageboss.from(asset).width(300).animation().url() }}
+{{ imageboss.from(asset).width(300).height(300).animation().format('mp4').url() }}
+
 {# Placeholder for lazy loading #}
 {{ imageboss.from(asset).width(800).ratio(16/9).placeholder() }}
 {{ imageboss.from(asset).preset('card').placeholder('#f0f0f0') }}
@@ -165,6 +169,7 @@ The plugin registers an `imageboss` template variable and Twig filters.
 
 {# With options array #}
 {{ imageboss.url(asset, { width: 800, height: 600, format: 'webp' }) }}
+{{ imageboss.url(asset, { width: 300, animation: true }) }}
 {{ imageboss.srcset(asset, { min: 300, max: 1200, interval: 200 }) }}
 {{ imageboss.placeholder(asset, { preset: 'card', color: '#e0e0e0' }) }}
 ```
@@ -229,6 +234,7 @@ $placeholder = $builder->width(800)->ratio(16/9)->placeholder();
 | `interval(int)` | Width step for srcset |
 | `format(string)` | Output format override |
 | `quality(int)` | Output quality 1-100 |
+| `animation(bool)` | Preserve animation for animated GIFs. By default ImageBoss only processes the first frame. Combine with `format('mp4')` to convert to video. |
 | `download(bool\|string)` | Force browser download. `true` keeps the original filename, a string sets a custom one. |
 | `preset(string\|BackedEnum\|ImagePreset)` | Apply preset configuration |
 | `url()` | Generate single URL |

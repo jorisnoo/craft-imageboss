@@ -69,6 +69,52 @@ it('omits quality from url by default', function () {
     expect($url)->not->toContain('quality:');
 });
 
+// --- Animation ---
+
+it('includes animation:true in url when animation() is enabled', function () {
+    $url = createBuilder()->width(300)->animation()->url();
+
+    expect($url)->toContain('animation:true');
+});
+
+it('includes animation:true in url when animation(true) is passed', function () {
+    $url = createBuilder()->width(300)->animation(true)->url();
+
+    expect($url)->toContain('animation:true');
+});
+
+it('omits animation from url by default', function () {
+    $url = createBuilder()->width(300)->url();
+
+    expect($url)->not->toContain('animation:');
+});
+
+it('omits animation from url when animation is false or null', function () {
+    $urlFalse = createBuilder()->width(300)->animation(false)->url();
+    $urlNull = createBuilder()->width(300)->animation(null)->url();
+
+    expect($urlFalse)->not->toContain('animation:')
+        ->and($urlNull)->not->toContain('animation:');
+});
+
+it('combines animation with mp4 format conversion in url', function () {
+    $url = createBuilder()->width(300)->height(300)->animation()->format('mp4')->url();
+
+    expect($url)->toContain('cover/300x300')
+        ->and($url)->toContain('animation:true')
+        ->and($url)->toContain('format:mp4');
+});
+
+it('applies animation from preset configuration', function () {
+    $settings = createSettings([
+        'presets' => ['gif' => ['min' => 300, 'max' => 300, 'animation' => true]],
+    ]);
+
+    $url = createBuilder(settings: $settings)->preset('gif')->width(300)->url();
+
+    expect($url)->toContain('animation:true');
+});
+
 // --- Focal points ---
 
 it('includes focal point in url', function () {

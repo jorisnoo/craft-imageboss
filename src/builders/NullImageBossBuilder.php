@@ -48,6 +48,11 @@ class NullImageBossBuilder extends ImageBossBuilder
         return $this;
     }
 
+    public function animation(?bool $animation = true): static
+    {
+        return $this;
+    }
+
     public function download(bool|string|null $download): static
     {
         return $this;

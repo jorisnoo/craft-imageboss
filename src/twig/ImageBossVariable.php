@@ -60,7 +60,7 @@ class ImageBossVariable
             return $builder->preset($options);
         }
 
-        foreach (['preset', 'width', 'height', 'ratio', 'min', 'max', 'interval', 'format', 'download'] as $key) {
+        foreach (['preset', 'width', 'height', 'ratio', 'min', 'max', 'interval', 'format', 'animation', 'download'] as $key) {
             if (isset($options[$key])) {
                 $builder->$key($options[$key]);
             }
