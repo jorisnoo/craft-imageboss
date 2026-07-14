@@ -7,7 +7,6 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 - default includeVolumeFolder to false in the Settings model ([a3bdc05](https://github.com/jorisnoo/craft-imageboss/commit/a3bdc05c75f73e2ac9ef423d2e3fa3f9bf35740c))
-
 ## [1.1.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.1.1) (2026-07-14)
 
 ### Bug Fixes
