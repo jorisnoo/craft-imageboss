@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.1.1) (2026-07-14)
+
+### Bug Fixes
+
+- disable includeVolumeFolder by default ([9128e4b](https://github.com/jorisnoo/craft-imageboss/commit/9128e4b79befb44082df0b9684671a0dea7a7fc4))
+- encode SVG placeholder data URIs to prevent srcset splitting ([6028380](https://github.com/jorisnoo/craft-imageboss/commit/60283800b343587320f3bf9e7d3ab0fcf4c8ef8b))
+
+### Chores
+
+- **deps:** bump actions/checkout from 6 to 7 ([93666f0](https://github.com/jorisnoo/craft-imageboss/commit/93666f089ecee05e81407ace65a06b2729990978))
 ## [1.1.0](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.1.0) (2026-07-14)
 
 ### Bug Fixes
