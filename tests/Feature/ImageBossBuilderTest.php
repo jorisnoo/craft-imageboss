@@ -350,13 +350,13 @@ it('prefers explicit ratio over calculated ratio in aspectRatio()', function () 
 it('generates placeholder with explicit width and height', function () {
     $placeholder = createBuilder()->width(800)->height(600)->placeholder();
 
-    expect($placeholder)->toBe("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3C/svg%3E");
+    expect($placeholder)->toBe('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27800%27%20height%3D%27600%27%2F%3E');
 });
 
 it('generates placeholder with width and ratio', function () {
     $placeholder = createBuilder()->width(800)->ratio(16 / 9)->placeholder();
 
-    expect($placeholder)->toBe("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3C/svg%3E");
+    expect($placeholder)->toBe('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27800%27%20height%3D%27450%27%2F%3E');
 });
 
 it('generates placeholder from asset native dimensions', function () {
@@ -364,14 +364,14 @@ it('generates placeholder from asset native dimensions', function () {
 
     $placeholder = createBuilder($asset)->placeholder();
 
-    expect($placeholder)->toBe("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080'%3E%3C/svg%3E");
+    expect($placeholder)->toBe('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271920%27%20height%3D%271080%27%2F%3E');
 });
 
 it('generates placeholder from preset min width and ratio', function () {
     $placeholder = createBuilder()->preset('card')->placeholder();
 
-    expect($placeholder)->toStartWith('data:image/svg+xml,')
-        ->and($placeholder)->toContain("width='300'");
+    expect($placeholder)->toStartWith('data:image/svg+xml;charset=utf-8,')
+        ->and(rawurldecode($placeholder))->toContain("width='300'");
 });
 
 it('returns empty string for placeholder when dimensions are unresolvable', function () {
@@ -387,7 +387,15 @@ it('generates placeholder starting with data uri prefix', function () {
 
     $placeholder = createBuilder($asset)->placeholder();
 
-    expect($placeholder)->toStartWith('data:image/svg+xml,');
+    expect($placeholder)->toStartWith('data:image/svg+xml;charset=utf-8,');
+});
+
+it('generates a placeholder free of whitespace so it survives in a srcset', function () {
+    $placeholder = createBuilder()->width(800)->height(600)->placeholder('#f0f0f0');
+
+    // srcset splits candidates on whitespace, so a single space here would make the
+    // whole candidate list unparseable and send the browser back to the src.
+    expect($placeholder)->not->toMatch('/\s/');
 });
 
 // --- Null builder ---
@@ -789,20 +797,23 @@ it('returns null first and last from empty TransformResult', function () {
 it('generates placeholder with color', function () {
     $placeholder = createBuilder()->width(800)->height(600)->placeholder('transparent');
 
-    expect($placeholder)->toContain("style='background:transparent'")
-        ->and($placeholder)->toContain("width='800'")
-        ->and($placeholder)->toContain("height='600'");
+    expect(rawurldecode($placeholder))->toContain("style='background:transparent'")
+        ->and(rawurldecode($placeholder))->toContain("width='800'")
+        ->and(rawurldecode($placeholder))->toContain("height='600'");
 });
 
 it('generates placeholder without color by default', function () {
     $placeholder = createBuilder()->width(800)->height(600)->placeholder();
 
-    expect($placeholder)->not->toContain('style')
-        ->and($placeholder)->not->toContain('background');
+    expect(rawurldecode($placeholder))->not->toContain('style')
+        ->and(rawurldecode($placeholder))->not->toContain('background');
 });
 
 it('generates placeholder with hex color', function () {
     $placeholder = createBuilder()->width(400)->height(300)->placeholder('#f0f0f0');
 
-    expect($placeholder)->toContain("style='background:#f0f0f0'");
+    // The `#` must stay percent-encoded, or the data URI ends at the fragment and the SVG is cut off.
+    expect($placeholder)->toContain('%23f0f0f0')
+        ->and($placeholder)->not->toContain('#')
+        ->and(rawurldecode($placeholder))->toContain("style='background:#f0f0f0'");
 });

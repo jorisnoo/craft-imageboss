@@ -273,7 +273,11 @@ class ImageBossBuilder
 
         $fill = $color ? " style='background:{$color}'" : '';
 
-        return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='{$width}' height='{$height}'{$fill}%3E%3C/svg%3E";
+        // Fully encoded: unencoded spaces would split the URI into bogus srcset
+        // candidates, and a `#` from a hex color would truncate it at the fragment.
+        return 'data:image/svg+xml;charset=utf-8,'.rawurlencode(
+            "<svg xmlns='http://www.w3.org/2000/svg' width='{$width}' height='{$height}'{$fill}/>"
+        );
     }
 
     /**
