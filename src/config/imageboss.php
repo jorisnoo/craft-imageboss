@@ -53,7 +53,7 @@ return [
     | parent directory containing multiple volume folders.
     |
     */
-    'includeVolumeFolder' => true,
+    'includeVolumeFolder' => false,
 
     /*
     |--------------------------------------------------------------------------
