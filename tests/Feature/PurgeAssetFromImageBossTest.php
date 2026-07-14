@@ -23,7 +23,7 @@ it('includes volume folder when configured', function () {
     $asset->shouldReceive('getVolume')->andReturn($volume);
     $asset->shouldReceive('getPath')->andReturn('photo.jpg');
 
-    $listener = new TestablePurgeAssetFromImageBoss(createSettings());
+    $listener = new TestablePurgeAssetFromImageBoss(createSettings(['includeVolumeFolder' => true]));
 
     expect($listener->buildPurgeUrl($asset))
         ->toBe('https://img.imageboss.me/test-source/uploads/photo.jpg');

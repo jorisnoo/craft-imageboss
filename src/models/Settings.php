@@ -14,7 +14,7 @@ class Settings extends Model
 
     public string $baseUrl = 'https://img.imageboss.me';
 
-    public bool $includeVolumeFolder = true;
+    public bool $includeVolumeFolder = false;
 
     public int $defaultWidth = 1000;
 

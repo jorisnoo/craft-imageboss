@@ -39,7 +39,7 @@ When `IMAGEBOSS_SOURCE` is not set, the plugin falls back to Craft's native imag
 | `token` | `null` | HMAC token for URL signing |
 | `apiKey` | `null` | API key for cache purging |
 | `baseUrl` | `https://img.imageboss.me` | ImageBoss CDN base URL |
-| `includeVolumeFolder` | `true` | Include volume folder name in URL path |
+| `includeVolumeFolder` | `false` | Include volume folder name in URL path |
 | `defaultWidth` | `1000` | Default width for `url()` |
 | `defaultInterval` | `200` | Step size for srcset generation |
 | `presets` | `[]` | Named preset configurations |
