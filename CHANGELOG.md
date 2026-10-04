@@ -2,12 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.2](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.1.2) (2026-07-14)
+## [1.1.2](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.1.2) (2026-07-14)
 
 ### Bug Fixes
 
 - default includeVolumeFolder to false in the Settings model ([a3bdc05](https://github.com/jorisnoo/craft-imageboss/commit/a3bdc05c75f73e2ac9ef423d2e3fa3f9bf35740c))
-## [1.1.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.1.1) (2026-07-14)
+## [1.1.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.1.1) (2026-07-14)
 
 ### Bug Fixes
 
@@ -27,13 +27,13 @@ All notable changes to this project will be documented in this file.
 ### Chores
 
 - **deps:** bump actions/checkout from 6 to 7 ([93666f0](https://github.com/jorisnoo/craft-imageboss/commit/93666f089ecee05e81407ace65a06b2729990978))
-## [1.0.3](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.3) (2026-06-02)
+## [1.0.3](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.0.3) (2026-06-02)
 
 ### Features
 
 - add animation support for animated GIFs ([2aad90a](https://github.com/jorisnoo/craft-imageboss/commit/2aad90a982dc734d6a1d083be86c2d5f085006f7))
 - **download:** support downloads without transform dimensions ([bb4cae7](https://github.com/jorisnoo/craft-imageboss/commit/bb4cae725f5587e3fe3b1882a28f663b6dcb8a31))
-## [1.0.2](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.2) (2026-05-16)
+## [1.0.2](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.0.2) (2026-05-16)
 
 ### Features
 
@@ -43,7 +43,7 @@ All notable changes to this project will be documented in this file.
 ### Documentation
 
 - document cache purging feature ([45637a0](https://github.com/jorisnoo/craft-imageboss/commit/45637a000c755b7d5f11edb820d3ded92b7b5157))
-## [1.0.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.1) (2026-05-16)
+## [1.0.1](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.0.1) (2026-05-16)
 
 ### ⚠ BREAKING CHANGES
 
@@ -58,7 +58,7 @@ All notable changes to this project will be documented in this file.
 ### Chores
 
 - add MIT license ([473aae9](https://github.com/jorisnoo/craft-imageboss/commit/473aae989f62d8add9db19a0a09c4d8e346bd381))
-## [1.0.0](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.0.0) (2026-05-12)
+## [1.0.0](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.0.0) (2026-05-12)
 
 ### Features
 
