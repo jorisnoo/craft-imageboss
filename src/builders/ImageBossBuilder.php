@@ -3,8 +3,8 @@
 namespace Noo\CraftImageboss\builders;
 
 use craft\elements\Asset;
-use craft\helpers\App;
 use Noo\CraftImageboss\contracts\ImagePreset;
+use Noo\CraftImageboss\helpers\AssetPath;
 use Noo\CraftImageboss\models\Settings;
 use Noo\CraftImageboss\Plugin;
 
@@ -31,6 +31,13 @@ class ImageBossBuilder
     private bool $animation = false;
 
     private ?string $download = null;
+
+    private ?Settings $settings = null;
+
+    private ?string $assetPath = null;
+
+    /** @var array{x: float, y: float}|false|null */
+    private array|false|null $focalPoint = false;
 
     public function __construct(Asset $asset)
     {
@@ -166,7 +173,7 @@ class ImageBossBuilder
             $config = $preset->config();
         } else {
             $presetName = $preset instanceof \BackedEnum ? $preset->value : $preset;
-            $settings = $this->getSettings();
+            $settings = $this->settings();
             $availablePresets = array_keys($settings->presets);
 
             if (! in_array($presetName, $availablePresets, true)) {
@@ -180,9 +187,10 @@ class ImageBossBuilder
             return $this;
         }
 
+        // Route through the setters so preset values get the same validation as direct calls.
         foreach (['min', 'max', 'ratio', 'interval', 'format', 'quality', 'animation'] as $key) {
             if (isset($config[$key])) {
-                $this->$key = $config[$key];
+                $this->$key($config[$key]);
             }
         }
 
@@ -195,7 +203,7 @@ class ImageBossBuilder
             return $this->cdn();
         }
 
-        $width = $this->width ?? $this->getSettings()->defaultWidth;
+        $width = $this->width ?? $this->settings()->defaultWidth;
 
         return $this->generateUrlForWidth($width);
     }
@@ -214,7 +222,7 @@ class ImageBossBuilder
      */
     public function cdn(array $options = []): string
     {
-        $settings = $this->getSettings();
+        $settings = $this->settings();
 
         if (! $settings->source) {
             return $this->asset->getUrl() ?? '';
@@ -236,7 +244,7 @@ class ImageBossBuilder
             $segments[] = implode(',', $opts);
         }
 
-        $this->appendAssetPath($segments);
+        $segments[] = $this->assetPath();
 
         return $this->signPath(implode('/', $segments));
     }
@@ -309,7 +317,7 @@ class ImageBossBuilder
 
     private function generateUrlForWidth(int $width): string
     {
-        $settings = $this->getSettings();
+        $settings = $this->settings();
         $height = $this->calculateHeight($width);
 
         if (! $settings->source) {
@@ -321,7 +329,7 @@ class ImageBossBuilder
 
     private function buildImageBossPath(int $width, ?int $height): string
     {
-        $settings = $this->getSettings();
+        $settings = $this->settings();
         $segments = ['', $settings->source];
 
         if ($height) {
@@ -350,35 +358,32 @@ class ImageBossBuilder
 
         $segments[] = implode(',', $opts);
 
-        $this->appendAssetPath($segments);
+        $segments[] = $this->assetPath();
 
         return implode('/', $segments);
     }
 
-    private function appendAssetPath(array &$segments): void
+    private function assetPath(): string
     {
-        $volume = $this->asset->getVolume();
-        $fs = $volume->getFs();
-
-        $settings = $this->getSettings();
-
-        if ($settings->includeVolumeFolder && property_exists($fs, 'path') && $fs->path !== '') {
-            $fullPath = trim(App::parseEnv($fs->path), '/');
-            $segments[] = basename($fullPath);
-        }
-
-        $subpath = $volume->getSubpath();
-        if ($subpath !== '') {
-            $segments[] = trim(App::parseEnv($subpath), '/');
-        }
-
-        $segments[] = $this->sanitizePath($this->asset->getPath());
+        return $this->assetPath ??= AssetPath::for($this->asset, $this->settings());
     }
 
     /**
      * @return array{x: float, y: float}|null
      */
     private function getFocalPoint(): ?array
+    {
+        if ($this->focalPoint === false) {
+            $this->focalPoint = $this->resolveFocalPoint();
+        }
+
+        return $this->focalPoint;
+    }
+
+    /**
+     * @return array{x: float, y: float}|null
+     */
+    private function resolveFocalPoint(): ?array
     {
         if (! $this->asset->getHasFocalPoint()) {
             return null;
@@ -418,7 +423,7 @@ class ImageBossBuilder
 
     private function signPath(string $path): string
     {
-        $settings = $this->getSettings();
+        $settings = $this->settings();
 
         if (! $settings->token) {
             return $settings->baseUrl . $path;
@@ -434,10 +439,12 @@ class ImageBossBuilder
      */
     private function generateWidths(): array
     {
-        $settings = $this->getSettings();
+        $settings = $this->settings();
         $min = $this->min ?? $settings->defaultWidth;
         $max = $this->max ?? $min;
-        $interval = $this->interval ?? $settings->defaultInterval;
+        // Guard against a non-positive interval (e.g. a misconfigured defaultInterval),
+        // which would otherwise loop forever.
+        $interval = max(1, $this->interval ?? $settings->defaultInterval);
 
         $widths = [];
 
@@ -465,12 +472,9 @@ class ImageBossBuilder
         return (int) round($width / $this->ratio);
     }
 
-    private function sanitizePath(string $path): string
+    private function settings(): Settings
     {
-        $path = str_replace(['\\', '..'], ['/', ''], $path);
-        $path = (string) preg_replace('#/+#', '/', $path);
-
-        return ltrim($path, '/');
+        return $this->settings ??= $this->getSettings();
     }
 
     protected function getSettings(): Settings

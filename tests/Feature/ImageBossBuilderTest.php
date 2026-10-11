@@ -303,6 +303,29 @@ it('always includes max width in srcset', function () {
     expect($widths)->toBe([300, 500, 700]);
 });
 
+it('ignores a non-positive interval from a preset', function () {
+    $settings = createSettings(['presets' => ['broken' => ['min' => 300, 'max' => 900, 'interval' => 0]]]);
+
+    $widths = array_column(createBuilder(settings: $settings)->preset('broken')->srcset(), 'width');
+
+    expect($widths)->toBe([300, 620, 900]);
+});
+
+it('does not loop forever when defaultInterval is not positive', function () {
+    $settings = createSettings(['defaultInterval' => 0]);
+
+    $widths = array_column(createBuilder(settings: $settings)->min(300)->max(303)->srcset(), 'width');
+
+    expect($widths)->toBe([300, 301, 302, 303]);
+});
+
+it('rejects non-positive default width and interval in settings', function () {
+    $settings = createSettings(['defaultInterval' => 0, 'defaultWidth' => 0]);
+
+    expect($settings->validate())->toBeFalse()
+        ->and($settings->getErrors())->toHaveKeys(['defaultInterval', 'defaultWidth']);
+});
+
 // --- Srcset string ---
 
 it('generates srcset string format', function () {
@@ -416,6 +439,15 @@ it('allows chaining on null builder', function () {
     $result = $builder->width(800)->height(600)->ratio(16 / 9)->min(320)->max(2560)->interval(320)->quality(90)->url();
 
     expect($result)->toBe('');
+});
+
+it('overrides every public builder method in the null builder', function () {
+    $notOverridden = array_filter(
+        (new ReflectionClass(NullImageBossBuilder::class))->getMethods(ReflectionMethod::IS_PUBLIC),
+        fn (ReflectionMethod $method) => $method->getDeclaringClass()->getName() !== NullImageBossBuilder::class,
+    );
+
+    expect(array_map(fn (ReflectionMethod $method) => $method->getName(), $notOverridden))->toBe([]);
 });
 
 it('returns empty string for placeholder from null builder', function () {
@@ -562,6 +594,45 @@ it('sanitizes path with double dots', function () {
 
     expect($url)->not->toContain('..')
         ->and($url)->toContain('secret/test.jpg');
+});
+
+it('keeps double dots inside a file name', function () {
+    $asset = createMockAsset(path: 'photos/a..b.jpg');
+
+    expect(createBuilder($asset)->width(800)->url())->toEndWith('/photos/a..b.jpg');
+});
+
+it('url-encodes each asset path segment', function () {
+    $asset = createMockAsset(path: 'my photos/a #1?.jpg');
+
+    expect(createBuilder($asset)->width(800)->url())
+        ->toEndWith('/my%20photos/a%20%231%3F.jpg');
+});
+
+it('url-encodes non-ascii and percent characters in asset path', function () {
+    $asset = createMockAsset(path: 'zürich/100%.jpg');
+
+    expect(createBuilder($asset)->width(800)->url())
+        ->toEndWith('/z%C3%BCrich/100%25.jpg');
+});
+
+it('keeps srcset candidates intact for asset paths with spaces', function () {
+    $asset = createMockAsset(path: 'my photo.jpg');
+    $candidates = explode(', ', createBuilder($asset)->min(300)->max(500)->interval(200)->srcsetString());
+
+    expect($candidates)->toHaveCount(2)
+        ->and(explode(' ', $candidates[0]))->toHaveCount(2);
+});
+
+it('signs the encoded path that appears in the url', function () {
+    $asset = createMockAsset(path: 'my photo.jpg');
+    $url = createBuilder($asset, createSettings(['token' => 'test-secret']))->width(800)->url();
+
+    $parsedUrl = parse_url($url);
+    parse_str($parsedUrl['query'], $query);
+
+    expect($parsedUrl['path'])->toContain('/my%20photo.jpg')
+        ->and($query['bossToken'])->toBe(hash_hmac('sha256', $parsedUrl['path'], 'test-secret'));
 });
 
 // --- CDN operation ---

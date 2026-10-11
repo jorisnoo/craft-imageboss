@@ -87,3 +87,22 @@ it('collapses multiple slashes in asset path', function () {
     expect($listener->buildPurgeUrl($asset))
         ->toBe('https://img.imageboss.me/test-source/images/photo.jpg');
 });
+
+it('url-encodes asset path segments in purge url', function () {
+    $asset = createMockAsset(path: 'my photos/zürich #1.jpg');
+    $listener = new TestablePurgeAssetFromImageBoss(createSettings());
+
+    expect($listener->buildPurgeUrl($asset))
+        ->toBe('https://img.imageboss.me/test-source/my%20photos/z%C3%BCrich%20%231.jpg');
+});
+
+it('purges the same asset path that transform urls use', function () {
+    $asset = createMockAsset(path: 'my photos/a..b.jpg');
+    $settings = createSettings();
+
+    $purgeUrl = (new TestablePurgeAssetFromImageBoss($settings))->buildPurgeUrl($asset);
+    $cdnUrl = createBuilder($asset, $settings)->cdn();
+
+    expect($purgeUrl)->toBe('https://img.imageboss.me/test-source/my%20photos/a..b.jpg')
+        ->and($cdnUrl)->toBe('https://img.imageboss.me/test-source/cdn/my%20photos/a..b.jpg');
+});
