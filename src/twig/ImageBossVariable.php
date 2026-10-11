@@ -9,7 +9,7 @@ use Noo\CraftImageboss\builders\TransformResult;
 
 class ImageBossVariable
 {
-    public function from(?Asset $asset): ImageBossBuilder|NullImageBossBuilder
+    public function from(?Asset $asset): ImageBossBuilder
     {
         if ($asset === null) {
             return new NullImageBossBuilder();
@@ -53,14 +53,14 @@ class ImageBossVariable
     }
 
     private function applyOptions(
-        ImageBossBuilder|NullImageBossBuilder $builder,
+        ImageBossBuilder $builder,
         string|array $options,
-    ): ImageBossBuilder|NullImageBossBuilder {
+    ): ImageBossBuilder {
         if (is_string($options)) {
             return $builder->preset($options);
         }
 
-        foreach (['preset', 'width', 'height', 'ratio', 'min', 'max', 'interval', 'format', 'animation', 'download'] as $key) {
+        foreach (['preset', 'width', 'height', 'ratio', 'min', 'max', 'interval', 'format', 'quality', 'animation', 'download'] as $key) {
             if (isset($options[$key])) {
                 $builder->$key($options[$key]);
             }

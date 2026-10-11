@@ -41,7 +41,7 @@ When `IMAGEBOSS_SOURCE` is not set, the plugin falls back to Craft's native imag
 | `baseUrl` | `https://img.imageboss.me` | ImageBoss CDN base URL |
 | `includeVolumeFolder` | `false` | Include volume folder name in URL path |
 | `defaultWidth` | `1000` | Default width for `url()` |
-| `defaultInterval` | `200` | Step size for srcset generation |
+| `defaultInterval` | `200` | Step size for srcset generation (must be at least 1) |
 | `presets` | `[]` | Named preset configurations |
 
 ### Presets
@@ -117,13 +117,13 @@ Preset::Thumbnail->interval(); // 250
 
 ### Cache Purging
 
-When `IMAGEBOSS_API_KEY` is set, the plugin listens for Craft's `EVENT_AFTER_REPLACE_ASSET` and queues a job that sends a `DELETE` request to the asset's ImageBoss URL. ImageBoss then clears all cached variants of the master image. See the [ImageBoss caching docs](https://imageboss.me/docs/api/caching) for details.
+When `IMAGEBOSS_API_KEY` and `IMAGEBOSS_SOURCE` are set, the plugin listens for Craft's `EVENT_AFTER_REPLACE_ASSET` and queues a job that sends a `DELETE` request to the asset's ImageBoss URL. ImageBoss then clears all cached variants of the master image. See the [ImageBoss caching docs](https://imageboss.me/docs/api/caching) for details.
 
 ## Usage
 
 ### Twig
 
-The plugin registers an `imageboss` template variable and Twig filters.
+The plugin registers an `imageboss` template variable and Twig filters, available in site, control panel and console-rendered templates.
 
 #### Fluent API
 
@@ -168,7 +168,7 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {{ imageboss.cdn(asset, { compression: false }) }}
 
 {# With options array #}
-{{ imageboss.url(asset, { width: 800, height: 600, format: 'webp' }) }}
+{{ imageboss.url(asset, { width: 800, height: 600, format: 'webp', quality: 80 }) }}
 {{ imageboss.url(asset, { width: 300, animation: true }) }}
 {{ imageboss.srcset(asset, { min: 300, max: 1200, interval: 200 }) }}
 {{ imageboss.placeholder(asset, { preset: 'card', color: '#e0e0e0' }) }}
@@ -273,7 +273,7 @@ Assets without a focal point default to center (`fp-x:0.5,fp-y:0.5`) so cover cr
 
 - Responsive srcset generation with configurable width ranges and intervals
 - Focal point support from Craft asset focal points
-- URL signing with HMAC-SHA256
+- URL signing with HMAC-SHA256 (asset path segments are URL-encoded; the signature covers the encoded path)
 - SVG placeholder generation for lazy loading
 - Named presets via config or typed enums
 - Automatic fallback to Craft's native transforms

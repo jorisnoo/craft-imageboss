@@ -24,9 +24,7 @@ class Plugin extends BasePlugin
         parent::init();
         self::$plugin = $this;
 
-        if (Craft::$app->getRequest()->getIsSiteRequest()) {
-            Craft::$app->getView()->registerTwigExtension(new ImageBossTwigExtension());
-        }
+        Craft::$app->getView()->registerTwigExtension(new ImageBossTwigExtension());
 
         Event::on(
             CraftVariable::class,
@@ -36,7 +34,11 @@ class Plugin extends BasePlugin
             }
         );
 
-        if ($this->getSettings()->apiKey) {
+        $settings = $this->getSettings();
+
+        // Without a source there is no ImageBoss URL to purge, and the API key must not
+        // be sent to a malformed URL.
+        if ($settings->apiKey && $settings->source) {
             $listener = new PurgeAssetFromImageBoss();
             Event::on(
                 Assets::class,

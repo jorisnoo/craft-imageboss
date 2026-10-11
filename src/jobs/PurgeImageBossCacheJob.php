@@ -2,8 +2,8 @@
 
 namespace Noo\CraftImageboss\jobs;
 
+use Craft;
 use craft\queue\BaseJob;
-use GuzzleHttp\Client;
 use Noo\CraftImageboss\Plugin;
 
 class PurgeImageBossCacheJob extends BaseJob
@@ -14,21 +14,13 @@ class PurgeImageBossCacheJob extends BaseJob
     {
         $apiKey = Plugin::$plugin->getSettings()->apiKey;
 
-        $client = new Client();
-
-        $response = $client->delete($this->url, [
+        // Craft's client picks up the project's Guzzle config (proxy, etc.); HTTP errors
+        // throw, so the job is marked as failed and can be retried from the queue manager.
+        Craft::createGuzzleClient(['timeout' => 30, 'connect_timeout' => 10])->delete($this->url, [
             'headers' => [
                 'imageboss-api-key' => $apiKey,
             ],
-            'http_errors' => false,
         ]);
-
-        if ($response->getStatusCode() >= 400) {
-            \Craft::error(
-                "ImageBoss cache purge failed for {$this->url} (HTTP {$response->getStatusCode()})",
-                __METHOD__
-            );
-        }
     }
 
     protected function defaultDescription(): ?string
