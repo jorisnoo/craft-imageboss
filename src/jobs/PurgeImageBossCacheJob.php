@@ -2,33 +2,51 @@
 
 namespace Noo\CraftImageboss\jobs;
 
+use Craft;
 use craft\queue\BaseJob;
-use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use Noo\CraftImageboss\Plugin;
+use RuntimeException;
+use yii\queue\RetryableJobInterface;
 
-class PurgeImageBossCacheJob extends BaseJob
+class PurgeImageBossCacheJob extends BaseJob implements RetryableJobInterface
 {
     public string $url;
 
     public function execute($queue): void
     {
-        $apiKey = Plugin::$plugin->getSettings()->apiKey;
+        $settings = Plugin::$plugin->getSettings();
+        if (! $settings->apiKey || ! $settings->source || ! str_starts_with($this->url, $settings->baseUrl . '/' . $settings->source . '/')) {
+            throw new RuntimeException('ImageBoss purge configuration no longer matches the queued asset.');
+        }
 
-        $client = new Client();
+        $client = Craft::createGuzzleClient(['timeout' => 10, 'connect_timeout' => 5]);
 
         $response = $client->delete($this->url, [
             'headers' => [
-                'imageboss-api-key' => $apiKey,
+                'imageboss-api-key' => $settings->apiKey,
             ],
             'http_errors' => false,
+            'allow_redirects' => false,
         ]);
 
-        if ($response->getStatusCode() >= 400) {
-            \Craft::error(
-                "ImageBoss cache purge failed for {$this->url} (HTTP {$response->getStatusCode()})",
-                __METHOD__
-            );
+        $status = $response->getStatusCode();
+        if ($status < 200 || $status >= 300) {
+            throw new RuntimeException("ImageBoss cache purge failed (HTTP {$status}).", $status);
         }
+    }
+
+    public function getTtr(): int
+    {
+        return 30;
+    }
+
+    public function canRetry($attempt, $error): bool
+    {
+        return $attempt < 3 && (
+            $error instanceof ConnectException ||
+            ($error instanceof RuntimeException && ($error->getCode() === 429 || ($error->getCode() >= 500 && $error->getCode() < 600)))
+        );
     }
 
     protected function defaultDescription(): ?string

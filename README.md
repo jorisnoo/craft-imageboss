@@ -117,13 +117,15 @@ Preset::Thumbnail->interval(); // 250
 
 ### Cache Purging
 
-When `IMAGEBOSS_API_KEY` is set, the plugin listens for Craft's `EVENT_AFTER_REPLACE_ASSET` and queues a job that sends a `DELETE` request to the asset's ImageBoss URL. ImageBoss then clears all cached variants of the master image. See the [ImageBoss caching docs](https://imageboss.me/docs/api/caching) for details.
+When `IMAGEBOSS_SOURCE` and `IMAGEBOSS_API_KEY` are set, replacing, moving, renaming or deleting an asset queues a purge of the ImageBoss master image and its variants. A path change purges both the original and the new path. Metadata-only saves do not purge. The worker uses Craft’s Guzzle configuration with finite timeouts; connection failures, rate limits and server errors are eligible for up to three attempts. Inspect failed jobs in Craft’s queue manager.
+
+ImageBoss processes purges asynchronously. Purging does not invalidate users’ browser caches or other CDNs; use a new filename when immediate client-side invalidation matters. See the [ImageBoss caching docs](https://imageboss.me/docs/api/caching).
 
 ## Usage
 
 ### Twig
 
-The plugin registers an `imageboss` template variable and Twig filters.
+The plugin registers the `craft.imageboss` template variable and Twig filters for site, control panel and console-rendered templates. For the shorthand `imageboss` used below, add `{% set imageboss = craft.imageboss %}` to your template.
 
 #### Fluent API
 
@@ -168,7 +170,7 @@ The plugin registers an `imageboss` template variable and Twig filters.
 {{ imageboss.cdn(asset, { compression: false }) }}
 
 {# With options array #}
-{{ imageboss.url(asset, { width: 800, height: 600, format: 'webp' }) }}
+{{ imageboss.url(asset, { width: 800, height: 600, format: 'webp', quality: 80 }) }}
 {{ imageboss.url(asset, { width: 300, animation: true }) }}
 {{ imageboss.srcset(asset, { min: 300, max: 1200, interval: 200 }) }}
 {{ imageboss.placeholder(asset, { preset: 'card', color: '#e0e0e0' }) }}
@@ -246,6 +248,10 @@ $placeholder = $builder->width(800)->ratio(16/9)->placeholder();
 | `aspectRatio()` | Get resolved aspect ratio |
 
 All setter methods accept `null` safely and return `$this` for chaining.
+
+For a single URL, width is chosen from explicit `width`, then `max`, `min`, and finally `defaultWidth`. For a srcset, explicit `width` fills in missing range bounds; `width` and `height` together preserve the crop ratio across candidates. Each range contains at most 50 widths and includes its maximum. Nonpositive preset dimensions, ratios and intervals are ignored.
+
+Asset path segments are percent-encoded before [URL signing](https://imageboss.me/docs/security). Custom download names are encoded as a single option value; path separators are replaced with hyphens. Placeholder backgrounds accept named colors, hex and numeric RGB/HSL colors; other expressions are omitted.
 
 ### Example Output
 

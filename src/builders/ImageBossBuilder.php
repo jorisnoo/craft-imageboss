@@ -3,13 +3,15 @@
 namespace Noo\CraftImageboss\builders;
 
 use craft\elements\Asset;
-use craft\helpers\App;
 use Noo\CraftImageboss\contracts\ImagePreset;
+use Noo\CraftImageboss\helpers\AssetPath;
 use Noo\CraftImageboss\models\Settings;
 use Noo\CraftImageboss\Plugin;
 
 class ImageBossBuilder
 {
+    private const MAX_CANDIDATES = 50;
+
     private Asset $asset;
 
     private ?int $width = null;
@@ -61,7 +63,7 @@ class ImageBossBuilder
 
     public function ratio(?float $ratio): static
     {
-        if ($ratio === null || $ratio <= 0) {
+        if ($ratio === null || ! is_finite($ratio) || $ratio <= 0) {
             return $this;
         }
 
@@ -142,7 +144,15 @@ class ImageBossBuilder
             return $this;
         }
 
-        $this->download = is_string($download) ? $download : '1';
+        if (is_string($download)) {
+            $name = trim(preg_replace('~[/\\\\\x00-\x1f\x7f]+~', '-', $download), " .-\t");
+            if ($name === '') {
+                return $this;
+            }
+            $this->download = rawurlencode($name);
+        } else {
+            $this->download = '1';
+        }
 
         return $this;
     }
@@ -182,7 +192,7 @@ class ImageBossBuilder
 
         foreach (['min', 'max', 'ratio', 'interval', 'format', 'quality', 'animation'] as $key) {
             if (isset($config[$key])) {
-                $this->$key = $config[$key];
+                $this->$key($config[$key]);
             }
         }
 
@@ -195,7 +205,7 @@ class ImageBossBuilder
             return $this->cdn();
         }
 
-        $width = $this->width ?? $this->getSettings()->defaultWidth;
+        $width = $this->width ?? $this->max ?? $this->min ?? max(1, $this->getSettings()->defaultWidth);
 
         return $this->generateUrlForWidth($width);
     }
@@ -236,7 +246,7 @@ class ImageBossBuilder
             $segments[] = implode(',', $opts);
         }
 
-        $this->appendAssetPath($segments);
+        $segments[] = AssetPath::for($this->asset, $settings);
 
         return $this->signPath(implode('/', $segments));
     }
@@ -271,7 +281,9 @@ class ImageBossBuilder
             return '';
         }
 
-        $fill = $color ? " style='background:{$color}'" : '';
+        // Accept CSS color literals, not arbitrary style declarations or resource URLs.
+        $fill = $color !== null && preg_match('/\A(?:[a-z]+|#[0-9a-f]{3,4}|#[0-9a-f]{6}|#[0-9a-f]{8}|(?:rgb|hsl)a?\([0-9.,% +\/-]+\))\z/i', $color)
+            ? " style='background:{$color}'" : '';
 
         // Fully encoded: unencoded spaces would split the URI into bogus srcset
         // candidates, and a `#` from a hex color would truncate it at the fragment.
@@ -350,29 +362,9 @@ class ImageBossBuilder
 
         $segments[] = implode(',', $opts);
 
-        $this->appendAssetPath($segments);
+        $segments[] = AssetPath::for($this->asset, $settings);
 
         return implode('/', $segments);
-    }
-
-    private function appendAssetPath(array &$segments): void
-    {
-        $volume = $this->asset->getVolume();
-        $fs = $volume->getFs();
-
-        $settings = $this->getSettings();
-
-        if ($settings->includeVolumeFolder && property_exists($fs, 'path') && $fs->path !== '') {
-            $fullPath = trim(App::parseEnv($fs->path), '/');
-            $segments[] = basename($fullPath);
-        }
-
-        $subpath = $volume->getSubpath();
-        if ($subpath !== '') {
-            $segments[] = trim(App::parseEnv($subpath), '/');
-        }
-
-        $segments[] = $this->sanitizePath($this->asset->getPath());
     }
 
     /**
@@ -435,42 +427,28 @@ class ImageBossBuilder
     private function generateWidths(): array
     {
         $settings = $this->getSettings();
-        $min = $this->min ?? $settings->defaultWidth;
-        $max = $this->max ?? $min;
-        $interval = $this->interval ?? $settings->defaultInterval;
+        $min = $this->min ?? $this->width ?? max(1, $settings->defaultWidth);
+        $max = $this->max ?? $this->width ?? $min;
+        $min = min($min, $max);
+        // Spread very large ranges across the budget; always keep both endpoints.
+        $minStep = intdiv(max(0, $max - $min - 1), self::MAX_CANDIDATES - 1) + 1;
+        $interval = max($minStep, $this->interval ?? $settings->defaultInterval);
 
         $widths = [];
 
-        for ($w = $min; $w <= $max; $w += $interval) {
+        for ($w = $min; $w < $max; $w += $interval) {
             $widths[] = $w;
         }
 
-        if (empty($widths) || end($widths) !== $max) {
-            $widths[] = $max;
-        }
+        $widths[] = $max;
 
         return $widths;
     }
 
     private function calculateHeight(int $width): ?int
     {
-        if ($this->height) {
-            return $this->height;
-        }
-
-        if (! $this->ratio) {
-            return null;
-        }
-
-        return (int) round($width / $this->ratio);
-    }
-
-    private function sanitizePath(string $path): string
-    {
-        $path = str_replace(['\\', '..'], ['/', ''], $path);
-        $path = (string) preg_replace('#/+#', '/', $path);
-
-        return ltrim($path, '/');
+        $ratio = $this->aspectRatio();
+        return $ratio === null ? $this->height : max(1, (int) round($width / $ratio));
     }
 
     protected function getSettings(): Settings

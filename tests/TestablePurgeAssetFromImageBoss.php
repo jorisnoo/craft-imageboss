@@ -12,7 +12,9 @@ class TestablePurgeAssetFromImageBoss extends PurgeAssetFromImageBoss
 {
     public function __construct(
         private Settings $testSettings,
-    ) {}
+    ) {
+        parent::__construct();
+    }
 
     protected function getSettings(): Settings
     {

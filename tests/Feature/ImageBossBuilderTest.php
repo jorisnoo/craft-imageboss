@@ -303,6 +303,35 @@ it('always includes max width in srcset', function () {
     expect($widths)->toBe([300, 500, 700]);
 });
 
+it('ignores invalid preset dimensions and bounds a misconfigured default range', function () {
+    $settings = createSettings([
+        'defaultInterval' => 0, 'defaultWidth' => 0,
+        'presets' => ['broken' => ['min' => 0, 'max' => 150, 'ratio' => -2, 'interval' => -1]],
+    ]);
+    $builder = createBuilder(settings: $settings);
+    expect($settings->validate())->toBeFalse()
+        ->and($settings->getErrors())->toHaveKeys(['defaultInterval', 'defaultWidth'])
+        ->and($builder->url())->toContain('/width/1/');
+
+    $candidates = $builder->preset('broken')->srcset();
+    expect(count($candidates))->toBeLessThanOrEqual(50)
+        ->and($candidates[0]['width'])->toBe(1)
+        ->and($candidates[0]['height'])->toBeNull()
+        ->and(end($candidates)['width'])->toBe(150);
+});
+
+it('resolves preset widths and scales explicit dimensions for each candidate', function () {
+    expect(createBuilder()->preset('shareImage')->url())->toContain('/cover/1200x630/')
+        ->and(createBuilder()->min(240)->url())->toContain('/width/240/');
+
+    $builder = createBuilder()->width(800)->height(600);
+    expect($builder->transform()->last()->url)->toContain('/cover/800x600/');
+    $candidates = $builder->min(400)->interval(200)->srcset();
+    expect(array_column($candidates, 'width'))->toBe([400, 600, 800])
+        ->and(array_column($candidates, 'height'))->toBe([300, 450, 600])
+        ->and($candidates[1]['url'])->toContain('/cover/600x450/');
+});
+
 // --- Srcset string ---
 
 it('generates srcset string format', function () {
@@ -673,6 +702,13 @@ it('generates cdn download url with custom filename', function () {
     expect($url)->toBe('https://img.imageboss.me/test-source/cdn/download:annual-report.pdf/docs/report.pdf');
 });
 
+it('keeps custom download names inside one options segment', function () {
+    $builder = createBuilder()->download('report, final/v2.pdf');
+    expect($builder->cdn())->toContain('/download:report%2C%20final-v2.pdf/')
+        ->and($builder->width(400)->url())->toContain(',download:report%2C%20final-v2.pdf/')
+        ->and(createBuilder()->download(' / ')->url())->not->toContain('download:');
+});
+
 it('falls back to asset url for cdn download when no source is configured', function () {
     $asset = createMockAsset(path: 'docs/report.pdf');
     $asset->shouldReceive('getUrl')->andReturn('/uploads/docs/report.pdf');
@@ -816,4 +852,11 @@ it('generates placeholder with hex color', function () {
     expect($placeholder)->toContain('%23f0f0f0')
         ->and($placeholder)->not->toContain('#')
         ->and(rawurldecode($placeholder))->toContain("style='background:#f0f0f0'");
+});
+
+it('omits invalid placeholder colors without changing the SVG structure', function () {
+    $svg = rawurldecode(explode(',', createBuilder()->width(40)->height(30)->placeholder("artist's blue"), 2)[1]);
+    $document = simplexml_load_string($svg);
+    expect((string) $document['width'])->toBe('40')
+        ->and(isset($document['style']))->toBeFalse();
 });

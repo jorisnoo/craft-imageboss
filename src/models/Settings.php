@@ -21,4 +21,9 @@ class Settings extends Model
     public int $defaultInterval = 200;
 
     public array $presets = [];
+
+    protected function defineRules(): array
+    {
+        return [...parent::defineRules(), [['defaultWidth', 'defaultInterval'], 'integer', 'min' => 1]];
+    }
 }
