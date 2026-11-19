@@ -13,7 +13,3 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
-    # Pest 5 requires PHP 8.4; keep running the same suite on our PHP 8.3 floor.
-    ignore:
-      - dependency-name: pestphp/pest
-        update-types: [version-update:semver-major]

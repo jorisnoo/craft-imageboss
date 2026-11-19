@@ -14,7 +14,7 @@ Configured release checks:
 composer check
 ```
 
-This validates Composer metadata, audits the installed lock and runs Pest. Pull requests and pushes to `main` must pass **Package checks** across PHP 8.3–8.5.
+This validates Composer metadata, audits the installed lock and runs Pest. Pull requests and pushes to `main` must pass **Package checks** across PHP 8.4–8.5.
 
 Install the project’s normal dependencies first. The helper runs these checks when publishing; dry-run prints them without executing them. Run any additional checks needed for the changed behavior before committing.
 
