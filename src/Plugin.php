@@ -5,7 +5,7 @@ namespace Noo\CraftImageboss;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
-use craft\services\Assets;
+use craft\elements\Asset;
 use craft\web\twig\variables\CraftVariable;
 use Noo\CraftImageboss\listeners\PurgeAssetFromImageBoss;
 use Noo\CraftImageboss\models\Settings;
@@ -24,9 +24,7 @@ class Plugin extends BasePlugin
         parent::init();
         self::$plugin = $this;
 
-        if (Craft::$app->getRequest()->getIsSiteRequest()) {
-            Craft::$app->getView()->registerTwigExtension(new ImageBossTwigExtension());
-        }
+        Craft::$app->getView()->registerTwigExtension(new ImageBossTwigExtension());
 
         Event::on(
             CraftVariable::class,
@@ -36,13 +34,12 @@ class Plugin extends BasePlugin
             }
         );
 
-        if ($this->getSettings()->apiKey) {
+        $settings = $this->getSettings();
+        if ($settings->source && $settings->apiKey) {
             $listener = new PurgeAssetFromImageBoss();
-            Event::on(
-                Assets::class,
-                Assets::EVENT_AFTER_REPLACE_ASSET,
-                [$listener, 'handle']
-            );
+            Event::on(Asset::class, Asset::EVENT_BEFORE_SAVE, [$listener, 'beforeSave']);
+            Event::on(Asset::class, Asset::EVENT_AFTER_SAVE, [$listener, 'afterSave']);
+            Event::on(Asset::class, Asset::EVENT_AFTER_DELETE, [$listener, 'afterDelete']);
         }
     }
 

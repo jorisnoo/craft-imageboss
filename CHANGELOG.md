@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.3] - 2026-11-19
+
+### Fixed
+
+- Single-image URLs respect preset widths, and responsive crops scale explicit dimensions proportionally. Invalid intervals and oversized ranges no longer cause unbounded srcsets.
+- Signing, serving and purging now use the same encoded asset path, including spaces, Unicode and filenames containing consecutive dots. Download names no longer break the options segment; placeholder colors cannot alter SVG markup.
+- Twig filters work in control panel and console renders, and the options-array API forwards `quality`.
+- Replacements, moves, renames and deletions invalidate cached paths. Purge requests use Craft's HTTP configuration, time out, retry transient failures and surface failures in the queue manager.
+
 ## [1.1.2](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.1.2) (2026-07-14)
 
 ### Bug Fixes
@@ -17,16 +26,9 @@ All notable changes to this project will be documented in this file.
 ### Chores
 
 - **deps:** bump actions/checkout from 6 to 7 ([93666f0](https://github.com/jorisnoo/craft-imageboss/commit/93666f089ecee05e81407ace65a06b2729990978))
-## [1.1.0](https://github.com/jorisnoo/craft-imageboss/releases/tag/v1.1.0) (2026-07-14)
 
-### Bug Fixes
+The planned 1.1.0 was never tagged; its changes shipped in 1.1.1.
 
-- disable includeVolumeFolder by default ([9128e4b](https://github.com/jorisnoo/craft-imageboss/commit/9128e4b79befb44082df0b9684671a0dea7a7fc4))
-- encode SVG placeholder data URIs to prevent srcset splitting ([6028380](https://github.com/jorisnoo/craft-imageboss/commit/60283800b343587320f3bf9e7d3ab0fcf4c8ef8b))
-
-### Chores
-
-- **deps:** bump actions/checkout from 6 to 7 ([93666f0](https://github.com/jorisnoo/craft-imageboss/commit/93666f089ecee05e81407ace65a06b2729990978))
 ## [1.0.3](https://github.com/jorisnoo/craft-imageboss/releases/tag/1.0.3) (2026-06-02)
 
 ### Features

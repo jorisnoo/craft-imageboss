@@ -3,6 +3,9 @@
 use Noo\CraftImageboss\models\Settings;
 use Noo\CraftImageboss\Tests\TestableImageBossBuilder;
 
+require_once __DIR__ . '/../vendor/yiisoft/yii2/Yii.php';
+require_once __DIR__ . '/../vendor/craftcms/cms/src/Craft.php';
+
 function createSettings(array $overrides = []): Settings
 {
     $settings = new Settings();

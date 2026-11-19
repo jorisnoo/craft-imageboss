@@ -43,6 +43,11 @@
         }
     },
     "scripts": {
+        "check": [
+            "@composer validate --strict --no-plugins",
+            "@composer audit --locked --no-plugins",
+            "@test"
+        ],
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage"
     },
